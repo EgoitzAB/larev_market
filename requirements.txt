@@ -1,0 +1,11 @@
+asgiref==3.8.1
+cffi==1.17.1
+cryptography==44.0.0
+Django==5.1.4
+django-allauth==65.3.1
+django-debug-toolbar==4.4.6
+fido2==1.2.0
+pycparser==2.22
+python-dotenv==1.0.1
+qrcode==8.0
+sqlparse==0.5.3

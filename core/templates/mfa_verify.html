@@ -1,0 +1,11 @@
+<form method="post">
+    {% csrf_token %}
+    <h2>Verificación de Inicio de Sesión</h2>
+    <p>Se ha enviado un código a tu correo electrónico. Por favor, ingrésalo a continuación:</p>
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+    <label for="code">Código:</label>
+    <input type="text" id="code" name="code" required>
+    <button type="submit">Verificar</button>
+</form>

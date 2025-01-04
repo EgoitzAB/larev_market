@@ -1,0 +1,46 @@
+# Entornos virtuales
+venv/
+.env/
+*.env
+
+# Archivos de bases de datos locales
+*.sqlite3
+*.db
+
+# Archivos compilados de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Archivos de configuraciones locales
+settings_local.py
+
+# Archivos generados estáticos y de medios
+/static/
+media/
+*.log
+*.pot
+
+# Archivos creados por herramientas de depuración
+debug.log
+
+# Archivos de paquetes y dependencias
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Configuraciones de IDEs
+.vscode/
+.idea/
+
+# Docker y contenedores
+*.pid
+docker-compose.override.yml
+
+# Git y metadata
+*.lock
