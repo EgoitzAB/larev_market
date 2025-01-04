@@ -1,0 +1,119 @@
+{% load static %}
+<div class="container-fluid fixed-top" style="top:0px;">
+    <!-- Top bar -->
+    <div class="container-fluid topbar bg-warning d-none d-lg-block">
+        <div class="d-flex justify-content-between">
+            <div class="top-info ps-2">
+                <small class="me-3">
+                    <i class="fas fa-map-marker-alt me-2 text-secondary"></i>
+                    <a href="#" class="text-white">123 Street, New York</a>
+                </small>
+                <small class="me-3">
+                    <i class="fas fa-envelope me-2 text-secondary"></i>
+                    <a href="#" class="text-white">Email@Example.com</a>
+                </small>
+            </div>
+            <div class="top-link pe-2">
+                <a href="{% url 'core:politica_de_privacidad' %}" class="text-white">
+                    <small class="text-white mx-2">Política de privacidad</small>/
+                </a>
+                <a href="{% url 'core:terminos_de_uso' %}" class="text-white">
+                    <small class="text-white mx-2">Términos de uso</small>/
+                </a>
+                <a href="#" class="text-white">
+                    <small class="text-white ms-2">Ventas y devoluciones</small>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <div class="container px-0">
+        <nav class="navbar navbar-light navbar-expand-xl">
+            <a href="{% url 'tienda:home' %}" class="navbar-brand d-flex align-items-center">
+                <img src="{% static 'favicon.ico' %}" alt="Logo" class="me-2" style="width: 30px; height: 30px;">
+                <h1 class="text-black display-6">La Revolución Verde CBD</h1>
+            </a>
+            <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <div class="navbar-nav mx-auto">
+                    {% for categoria in categorias %}
+                    <div class="nav-item dropdown">
+                        <a href="{% url 'tienda:listado_producto' %}?categoria={{ categoria.nombre|urlencode }}" 
+                           class="nav-link dropdown-toggle" 
+                           id="dropdownMenu{{ forloop.counter }}" 
+                           data-bs-toggle="dropdown" 
+                           aria-expanded="false">
+                           {{ categoria.nombre }}
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu{{ forloop.counter }}">
+                            {% for producto in productos %}
+                            {% if producto.categoria == categoria %}
+                            <li>
+                                <a class="dropdown-item" 
+                                   href="{% url 'tienda:listado_producto' %}?producto={{ producto.nombre|urlencode }}">
+                                   {{ producto.nombre }}
+                                </a>
+                            </li>
+                            {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endfor %}
+                    <a href="#!" class="nav-item nav-link">Sobre nosotros</a>
+                    <a href="{% url 'tienda:contacto' %}" class="nav-item nav-link">Contacto</a>
+                </div>
+                <ul class="navbar-nav ms-auto">
+                    <!-- Search Icon -->
+                    <li class="nav-item search-container">
+                        <a href="#" class="nav-link" id="searchIcon">
+                            <i class="bi bi-search"></i>
+                            <div id="searchForm" class="container-fluid bg-light">
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <form action="{% url 'tienda:buscar' %}" method="GET" class="d-flex form-inline">
+                                                <input type="text" class="form-control me-2" name="q" placeholder="Buscar productos...">
+                                                <button class="btn btn-outline-success" type="submit">Buscar</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    <!-- Cart Icon -->
+                    <li class="nav-item">
+                        <a href="{% url 'carrito:carrito_detalle' %}" class="nav-link">
+                            <i class="bi bi-cart-fill"></i>
+                            <span class="badge bg-dark text-white ms-1 rounded-pill">{{ request.session.carrito|length }}</span>
+                        </a>
+                    </li>
+                    <!-- User Icon -->
+                    <li class="nav-item dropdown">
+                        {% if not user.is_authenticated %}
+                        <a href="#" class="nav-link dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="{% url 'account_login' %}">Entrar</a></li>
+                            <li><a class="dropdown-item" href="{% url 'account_signup' %}">Registrarse</a></li>
+                        </ul>
+                        {% else %}
+                        <a href="#" class="nav-link dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="{% url 'tienda:perfil' %}">Perfil</a></li>
+                            <li><a class="dropdown-item" href="{% url 'account_email' %}">Cambiar e-mail</a></li>
+                            <li><a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a></li>
+                        </ul>
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+</div>

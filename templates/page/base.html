@@ -1,0 +1,27 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+    <!-- Style -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    {% block extrahead %}
+
+    {% endblock extrahead %}
+    <title>{% block title %}{% endblock title %}</title>
+  </head>
+  <body {% block body_class %} {% endblock body_class %}>
+    {% block navbar %}{% endblock navbar %}
+
+    {# % include 'messages.html' % #}
+    {% block content %}
+    {% endblock content %}
+
+    {% block footer %}
+    {% endblock footer %}
+    {% include 'page/footer.html' %}
+    {% block javascript %}{% endblock javascript %}
+  </body>
+</html>

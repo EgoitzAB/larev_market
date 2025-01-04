@@ -1,0 +1,18 @@
+{% for field in attrs.form.visible_fields %}
+    {% if field.name != 'remember' %}
+        <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            <div class="field-wrapper">
+                {{ field }}
+            </div>
+        </div>
+    {% endif %}
+{% endfor %}
+
+{# Renderizar el campo "recordar contraseña" por separado #}
+<div class="form-group">
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="remember" id="id_remember">
+        <label class="form-check-label" for="id_remember">Recordar contraseña</label>
+    </div>
+</div>

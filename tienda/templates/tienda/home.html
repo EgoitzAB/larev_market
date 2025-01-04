@@ -1,0 +1,39 @@
+{% extends "page/base.html" %}
+
+{% block navbar %}
+
+{% include 'page/navbar.html' %}
+
+{% endblock navbar %}
+    
+{% block content %}
+<section>
+    {% for categoria, productos in productos_por_categoria.items %}
+    <div id="{{ categoria }}">
+        <h2>{{ categoria }}</h2>
+        <div class="product-grid">
+            {% for producto in productos %}
+            <div class="product-card">
+                <h3>{{ producto.nombre }}</h3>
+                <img src="{{ producto.imagen1.url }}" alt="{{ producto.nombre }}">
+                <p>{{ producto.descripcion }}</p>
+                <div class="variants">
+                    {% for variante in producto.variantes.all %}
+                    <div class="variant">
+                        <p>{{ variante.nombre }}</p>
+                        <p>Precio: €{{ variante.precio }}</p>
+                        {% if variante.imagen1 %}
+                        <img src="{{ variante.imagen1.url }}" alt="{{ variante.nombre }}">
+                        {% else %}
+                        <img src="{{ producto.imagen1.url }}" alt="{{ variante.nombre }}">
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</section>
+{% endblock %}
