@@ -143,6 +143,7 @@ USE_I18N = True
 
 USE_TZ = True
 
+SITE_ID = 1
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
@@ -165,6 +166,8 @@ EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'tu-email@example.com')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', 'tu-contraseña')
+
+CARRITO_SESSION_ID = 'carrito'
 
 #LOGIN_REDIRECT_URL = '/accounts/mfa/verify/'
 ACCOUNT_EMAIL_REQUIRED = True

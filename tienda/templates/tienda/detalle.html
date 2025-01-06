@@ -1,0 +1,43 @@
+<!-- detalle.html -->
+
+{% extends 'page/base.html' %}
+{% block content %}
+<h1>{{ producto.nombre }}</h1>
+<img src="{{ producto.imagen1.url }}" alt="{{ producto.nombre }}">
+
+<p>{{ producto.descripcion }}</p>
+
+<!-- Variantes del producto -->
+{% if variantes %}
+    <h3>Variantes disponibles</h3>
+    <ul>
+        {% for variante in variantes %}
+        <li>
+            <h4>{{ variante.nombre }}</h4>
+            <p>Precio: {{ variante.precio }} | Stock: {{ variante.stock }}</p>
+            <img src="{{ variante.get_imagen1.url }}" alt="{{ variante.nombre }}">
+        </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No hay variantes disponibles para este producto.</p>
+{% endif %}
+
+<!-- Formulario para añadir al carrito -->
+<form method="post">
+    {{ formulario_carrito.as_p }}
+    <button type="submit">Añadir al carrito</button>
+</form>
+
+<h3>Productos Recomendados</h3>
+<div class="productos-recomendados">
+    {% for producto in productos_recomendados %}
+    <div class="producto-recomendado">
+        <a href="{% url 'tienda:detalle_producto' producto.slug %}">
+            <img src="{{ producto.imagen1.url }}" alt="{{ producto.nombre }}">
+            <h4>{{ producto.nombre }}</h4>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

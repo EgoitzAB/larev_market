@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 
+import os
 import uuid
 from PIL import Image
 
@@ -22,13 +23,17 @@ class ImageOptimizableModel(models.Model):
         try:
             with Image.open(image_field.path) as img:
                 img = img.convert("RGB")
-                img.save(image_field.path, format="WebP", optimize=True, quality=80)
+                max_dimension = 980
+                img.thumbnail((max_dimension, max_dimension))
+                new_image_path = os.path.splitext(image_field.path)[0] + ".webp"
+                img.save(new_image_path, format="WebP", optimize=True, quality=75)
+                image_field.name = os.path.basename(new_image_path)
         except Exception as e:
             print(f"Error optimizando imagen: {e}")
 
 
 # Categorías
-class Categoria(models.Model):
+class Categoria(ImageOptimizableModel):
     """
     Categorías para los productos, como 'Flores', 'Resina', 'Ropa', etc.
     """
@@ -57,11 +62,13 @@ class Categoria(models.Model):
 
 
 # Productos
-class Producto(models.Model):
+class Producto(ImageOptimizableModel):
     """
     Productos principales, como 'Flores Lemon Haze', 'Camiseta de Cáñamo', etc.
     """
     nombre = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=100, unique=True, blank=True)
+
     categoria = models.ForeignKey(
         Categoria,
         on_delete=models.PROTECT,
@@ -101,7 +108,7 @@ class Producto(models.Model):
 
 
 # Variantes (opcional por peso, talla, etc.)
-class ProductoVariante(models.Model):
+class ProductoVariante(ImageOptimizableModel):
     """
     Variantes de producto, como peso, talla o formato.
     """
@@ -150,6 +157,17 @@ class ProductoVariante(models.Model):
 
     def __str__(self):
         return f"{self.producto.nombre} - {self.nombre}"
+    
+    def get_imagen1(self):
+        # Si la variante tiene imagen, la devuelve. Si no, devuelve la imagen del producto
+        if self.imagen1:
+            return self.imagen1
+        return self.producto.imagen1
+
+    def get_imagen2(self):
+        if self.imagen2:
+            return self.imagen2
+        return self.producto.imagen2
     
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

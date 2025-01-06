@@ -46,10 +46,10 @@
                            id="dropdownMenu{{ forloop.counter }}" 
                            data-bs-toggle="dropdown" 
                            aria-expanded="false">
-                           {{ categoria.nombre }}
+                           {{ categoria.nombre|title }}
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenu{{ forloop.counter }}">
-                            {% for producto in productos %}
+                            {% for producto in categoria.productos.all %}
                             {% if producto.categoria == categoria %}
                             <li>
                                 <a class="dropdown-item" 

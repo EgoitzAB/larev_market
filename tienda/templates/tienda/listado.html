@@ -1,0 +1,31 @@
+<!-- listado.html -->
+
+{% extends 'page/base.html' %}
+{% block content %}
+<h1>Productos</h1>
+
+<!-- Filtros de Categorías -->
+<div>
+    <h3>Categorías</h3>
+    <ul>
+        {% for categoria in categorias %}
+            <li><a href="?categoria={{ categoria.nombre }}">{{ categoria.nombre }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
+
+<!-- Productos -->
+<div class="productos">
+    <h2>Productos</h2>
+    <div class="productos-lista">
+        {% for producto in productos %}
+        <div class="producto-item">
+            <a href="{% url 'tienda:detalle_producto' producto.slug %}">
+                <img src="{{ producto.imagen1.url }}" alt="{{ producto.nombre }}">
+                <h3>{{ producto.nombre }}</h3>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
