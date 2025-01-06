@@ -9,6 +9,8 @@ class EmailMFAMiddleware:
 
     def __call__(self, request):
         if request.user.is_authenticated and not request.session.get('mfa_verified', False):
-            if request.path != '/accounts/mfa/verify/':
+            # Excepciones para rutas específicas
+            if request.path not in ['/accounts/mfa/verify/', '/accounts/confirm-email/']:
                 return redirect('core:verify_email_mfa')
         return self.get_response(request)
+

@@ -28,11 +28,11 @@
     </div>
 
     <!-- Navbar -->
-    <div class="container px-0">
-        <nav class="navbar navbar-light navbar-expand-xl">
+    <div class="container-fluid navbar-container px-0">
+        <nav class="navbar navbar-expand-xl navbar-dark">
             <a href="{% url 'tienda:home' %}" class="navbar-brand d-flex align-items-center">
                 <img src="{% static 'favicon.ico' %}" alt="Logo" class="me-2" style="width: 30px; height: 30px;">
-                <h1 class="text-black display-6">La Revolución Verde CBD</h1>
+                <h1 class="text-white display-6">La Revolución Verde CBD</h1>
             </a>
             <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
                 <span class="navbar-toggler-icon"></span>
@@ -63,7 +63,7 @@
                     </div>
                     {% endfor %}
                     <a href="#!" class="nav-item nav-link">Sobre nosotros</a>
-                    <a href="{% url 'tienda:contacto' %}" class="nav-item nav-link">Contacto</a>
+                    <a href="{% url 'core:tienda_info' %}" class="nav-item nav-link">Contacto</a>
                 </div>
                 <ul class="navbar-nav ms-auto">
                     <!-- Search Icon -->
@@ -74,7 +74,7 @@
                                 <div class="container">
                                     <div class="row">
                                         <div class="col-12">
-                                            <form action="{% url 'tienda:buscar' %}" method="GET" class="d-flex form-inline">
+                                            <form action='#' method="GET" class="d-flex form-inline">
                                                 <input type="text" class="form-control me-2" name="q" placeholder="Buscar productos...">
                                                 <button class="btn btn-outline-success" type="submit">Buscar</button>
                                             </form>
@@ -90,7 +90,7 @@
                             <i class="bi bi-cart-fill"></i>
                             <span class="badge bg-dark text-white ms-1 rounded-pill">{{ request.session.carrito|length }}</span>
                         </a>
-                    </li>
+                    </li>                                
                     <!-- User Icon -->
                     <li class="nav-item dropdown">
                         {% if not user.is_authenticated %}
@@ -106,7 +106,7 @@
                             <i class="bi bi-person-circle"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                            <li><a class="dropdown-item" href="{% url 'tienda:perfil' %}">Perfil</a></li>
+                            <li><a class="dropdown-item" href="{% url 'core:perfil' %}">Perfil</a></li>
                             <li><a class="dropdown-item" href="{% url 'account_email' %}">Cambiar e-mail</a></li>
                             <li><a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a></li>
                         </ul>

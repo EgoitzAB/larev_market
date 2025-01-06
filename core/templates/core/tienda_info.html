@@ -1,0 +1,21 @@
+{% extends "page/base.html" %}
+
+{% block content %}
+<div class="info-tienda">
+    <h1>{{ nombre_tienda }}</h1>
+    <p>{{ descripcion }}</p>
+
+    <h2>Misión</h2>
+    <p>{{ mision }}</p>
+
+    <h2>Visión</h2>
+    <p>{{ vision }}</p>
+
+    <h2>Nuestras Ubicaciones</h2>
+    <ul>
+        {% for ubicacion in ubicaciones %}
+            <li><strong>{{ ubicacion.ciudad }}:</strong> {{ ubicacion.direccion }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
