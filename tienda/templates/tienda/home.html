@@ -8,24 +8,32 @@
     
 {% block content %}
 <section>
-    {% for categoria, productos in productos_por_categoria.items %}
-    <div id="{{ categoria }}">
+    {% for categoria, productos in productos_por_categoria_json.items %}
+    <div id="{{ categoria|slugify }}">
         <h2>{{ categoria }}</h2>
+        {% if productos %}
         <div class="product-grid">
             {% for producto in productos %}
             <div class="product-card">
                 <h3>{{ producto.nombre }}</h3>
-                <img src="{{ producto.imagen1.url }}" alt="{{ producto.nombre }}">
+                {% if producto.imagen1 %}
+                <img src="{{ producto.imagen1 }}" alt="{{ producto.nombre }}">
+                {% else %}
+                <p>Imagen no disponible</p>
+                {% endif %}
                 <p>{{ producto.descripcion }}</p>
                 <div class="variants">
-                    {% for variante in producto.variantes.all %}
+                    {% for variante in producto.variantes %}
                     <div class="variant">
                         <p>{{ variante.nombre }}</p>
                         <p>Precio: €{{ variante.precio }}</p>
+                        <p>Stock: {{ variante.stock }}</p>
+                        {% if variante.peso %}<p>Peso: {{ variante.peso }} g</p>{% endif %}
+                        {% if variante.talla %}<p>Talla: {{ variante.talla }}</p>{% endif %}
                         {% if variante.imagen1 %}
-                        <img src="{{ variante.imagen1.url }}" alt="{{ variante.nombre }}">
+                        <img src="{{ variante.imagen1 }}" alt="{{ variante.nombre }}">
                         {% else %}
-                        <img src="{{ producto.imagen1.url }}" alt="{{ variante.nombre }}">
+                        <p>Imagen no disponible</p>
                         {% endif %}
                     </div>
                     {% endfor %}
@@ -33,7 +41,16 @@
             </div>
             {% endfor %}
         </div>
+        {% else %}
+        <p>Sin productos en esta categoría</p>
+        {% endif %}
     </div>
     {% endfor %}
 </section>
+
+<!-- Exponer los datos como JSON para manipular con JS -->
+<script>
+    const productosPorCategoria = {{ productos_por_categoria_json|safe }};
+</script>
 {% endblock %}
+
