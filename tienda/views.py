@@ -1,11 +1,8 @@
-import json
-from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView, ListView, DetailView
 from .models import Categoria, Producto, ProductoVariante
 from carrito.forms import CarritoAñadirProductoForm
 from .recomendador import Recomendador
-
 
 class HomeView(TemplateView):
     template_name = "tienda/home.html"
@@ -15,42 +12,8 @@ class HomeView(TemplateView):
         Sobrescribe el método para añadir datos al contexto del template.
         """
         context = super().get_context_data(**kwargs)
-
-        # Prefetch de categorías, productos y variantes en una sola consulta
-        categorias = Categoria.objects.prefetch_related(
-            'productos__variantes'
-        )
-
-        # Construir un JSON-like dict con todas las categorías, productos y variantes
-        productos_por_categoria = {
-            categoria.nombre: [
-                {
-                    'id': producto.id,
-                    'nombre': producto.nombre,
-                    'descripcion': producto.descripcion,
-                    'imagen1': producto.imagen1.url if producto.imagen1 else None,
-                    'variantes': [
-                        {
-                            'id': variante.id,
-                            'nombre': variante.nombre,
-                            'precio': str(variante.precio),
-                            'stock': variante.stock,
-                            'peso': variante.peso,
-                            'talla': variante.talla,
-                            'imagen1': variante.get_imagen1().url if variante.get_imagen1() else None,
-                            'imagen2': variante.get_imagen2().url if variante.get_imagen2() else None,
-                        }
-                        for variante in producto.variantes.all()
-                    ]
-                }
-                for producto in categoria.productos.filter(is_active=True)
-            ]
-            for categoria in categorias
-        }
-
-        # Serializar productos_por_categoria como JSON para el template
-        context['productos_por_categoria_json'] = productos_por_categoria
-        
+        # Ya no es necesario agregar 'productos_por_categoria_json' manualmente,
+        # ya que se añadirá automáticamente desde el context processor
         return context
 
 

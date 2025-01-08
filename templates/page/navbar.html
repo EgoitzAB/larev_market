@@ -39,25 +39,23 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <div class="navbar-nav mx-auto">
-                    {% for categoria in categorias %}
+                    {% for categoria, productos in productos_por_categoria_json.items %}
                     <div class="nav-item dropdown">
-                        <a href="{% url 'tienda:listado_producto' %}?categoria={{ categoria.nombre|urlencode }}" 
+                        <a href="{% url 'tienda:listado_producto' %}?categoria={{ categoria|urlencode }}" 
                            class="nav-link dropdown-toggle" 
                            id="dropdownMenu{{ forloop.counter }}" 
                            data-bs-toggle="dropdown" 
                            aria-expanded="false">
-                           {{ categoria.nombre|title }}
+                           {{ categoria|title }}
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenu{{ forloop.counter }}">
-                            {% for producto in categoria.productos.all %}
-                            {% if producto.categoria == categoria %}
+                            {% for producto in productos %}
                             <li>
                                 <a class="dropdown-item" 
                                    href="{% url 'tienda:listado_producto' %}?producto={{ producto.nombre|urlencode }}">
                                    {{ producto.nombre }}
                                 </a>
                             </li>
-                            {% endif %}
                             {% endfor %}
                         </ul>
                     </div>

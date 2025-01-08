@@ -1,6 +1,13 @@
 <!-- detalle.html -->
 
 {% extends 'page/base.html' %}
+
+{% block navbar %}
+
+{% include 'page/navbar.html' %}
+
+{% endblock navbar %}
+
 {% block content %}
 <h1>{{ producto.nombre }}</h1>
 <img src="{{ producto.imagen1.url }}" alt="{{ producto.nombre }}">
