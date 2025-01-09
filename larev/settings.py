@@ -63,6 +63,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
 #    "core.middleware.EmailMFAMiddleware", # email 2fa middlware
+    'tienda.middleware.VerificacionEdadMiddleware',
     "allauth.account.middleware.AccountMiddleware",
 ]
 

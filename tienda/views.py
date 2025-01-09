@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import TemplateView, ListView, DetailView
 from .models import Categoria, Producto, ProductoVariante
 from carrito.forms import CarritoAñadirProductoForm
@@ -12,10 +12,14 @@ class HomeView(TemplateView):
         Sobrescribe el método para añadir datos al contexto del template.
         """
         context = super().get_context_data(**kwargs)
-        # Ya no es necesario agregar 'productos_por_categoria_json' manualmente,
-        # ya que se añadirá automáticamente desde el context processor
+        context['mostrar_modal'] = not self.request.session.get('es_mayor_de_edad', False)
         return context
 
+def verificar_edad(request):
+    if request.method == "POST" and request.POST.get("edad_confirmada"):
+        request.session['es_mayor_de_edad'] = True
+        return redirect('tienda:home')  # Redirigir a la página principal
+    return redirect('tienda:home')  # En caso de fallo, volver a la página
 
 class CategoriasView(ListView):
     model = Producto

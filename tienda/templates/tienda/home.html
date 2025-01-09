@@ -1,4 +1,5 @@
 {% extends "page/base.html" %}
+{% load static %}
 
 {% block navbar %}
 
@@ -7,6 +8,24 @@
 {% endblock navbar %}
     
 {% block content %}
+<!-- Modal para verificación de edad -->
+{% if mostrar_modal %}
+<div class="overlay">
+    <div class="custom-modal">
+        <img src="{% static 'favicon.png' %}" alt="Verificación de Edad">
+        <h1>Verificación de Edad</h1>
+        <p>Debes tener al menos 18 años para acceder a este sitio web.</p>
+        <form method="post" action="{% url 'tienda:verificar_edad' %}">
+            {% csrf_token %}
+            <label>
+                <input type="checkbox" name="edad_confirmada" required>
+                Confirmo que tengo 18 años o más
+            </label>
+            <button type="submit">Entrar</button>
+        </form>
+    </div>
+</div>
+{% endif %}
 <section>
     {% for categoria, productos in productos_por_categoria_json.items %}
     <div id="{{ categoria|slugify }}">
@@ -52,5 +71,6 @@
 <script>
     const productosPorCategoria = {{ productos_por_categoria_json|safe }};
 </script>
+
 {% endblock %}
 
