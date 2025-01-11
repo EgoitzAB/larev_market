@@ -1,0 +1,51 @@
+<h1>Checkout</h1>
+
+<form method="post">
+    {% csrf_token %}
+    
+    <h2>Seleccionar Dirección</h2>
+    {% if direcciones.exists %}
+        <ul>
+            {% for direccion in direcciones %}
+                <li>
+                    <label>
+                        <input type="radio" name="direccion_id" value="{{ direccion.id }}">
+                        {{ direccion.nombre_completo }}, {{ direccion.direccion }},
+                        {{ direccion.ciudad }} - {{ direccion.codigo_postal }}, {{ direccion.pais }}
+                    </label>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No tienes direcciones guardadas. Por favor ingresa una nueva.</p>
+    {% endif %}
+
+    <h2>Ingresar Nueva Dirección</h2>
+    {{ form.as_p }}
+
+    <button type="submit">Continuar al Pago</button>
+</form>
+
+<h2>Resumen del Carrito</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Precio</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in carrito %}
+            <tr>
+                <td>{{ item.producto.nombre }}</td>
+                <td>{{ item.cantidad }}</td>
+                <td>{{ item.precio }}</td>
+                <td>{{ item.precio_total }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h3>Total: {{ carrito.carrito_total }}</h3>

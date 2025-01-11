@@ -23,6 +23,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('carrito/', include('carrito.urls', namespace='carrito')),
+    path('checkout/', include('checkout.urls', namespace='checkout')),
+    path('pagos/', include('pagos.urls')),
     path('', include('tienda.urls')),
     path('', include('core.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

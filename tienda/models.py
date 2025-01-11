@@ -102,6 +102,8 @@ class Producto(ImageOptimizableModel):
         return self.nombre
 
     def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.nombre)
         super().save(*args, **kwargs)
         self.optimize_image(self.imagen1)
         self.optimize_image(self.imagen2)
@@ -122,6 +124,7 @@ class ProductoVariante(ImageOptimizableModel):
     nombre = models.CharField(max_length=100, help_text="Nombre de la variante, e.g., 'Lemon Haze 5g'.")
     precio = models.DecimalField(max_digits=10, decimal_places=2, help_text="Precio de esta variante.")
     stock = models.PositiveIntegerField(default=0, help_text="Cantidad en stock.")
+    slug = models.SlugField(unique=True, blank=True, null=True)
     peso = models.DecimalField(
         max_digits=5,
         decimal_places=2,
@@ -150,11 +153,6 @@ class ProductoVariante(ImageOptimizableModel):
         help_text="Imagen de la variante (opcional, se usa si no hay imagen del producto)."
     )
 
-
-    class Meta:
-        verbose_name = "Variante de producto"
-        verbose_name_plural = "Variantes de producto"
-
     def __str__(self):
         return f"{self.producto.nombre} - {self.nombre}"
     
@@ -170,6 +168,14 @@ class ProductoVariante(ImageOptimizableModel):
         return self.producto.imagen2
     
     def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{self.producto.nombre}-{self.nombre}")
         super().save(*args, **kwargs)
         self.optimize_image(self.imagen1)
         self.optimize_image(self.imagen2)
+
+
+    class Meta:
+        verbose_name = "Variante de producto"
+        verbose_name_plural = "Variantes de producto"
+        unique_together = ('producto', 'slug')

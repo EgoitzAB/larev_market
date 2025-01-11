@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     'core',
     'tienda',
     'carrito',
+    'pagos',
+    'checkout',
 ]
 
 MIDDLEWARE = [
@@ -83,6 +85,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 #context processor con los productos de la tienda
                 'core.context_processors.productos_por_categoria',
+                'carrito.context_processors.carrito',
             ],
         },
     },
@@ -176,3 +179,8 @@ CARRITO_SESSION_ID = 'carrito'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"  # Asegúrate de que se verifique el correo electrónico.
 ACCOUNT_AUTHENTICATED_REDIRECT_URL = '/'
+
+
+PAYGREEN_PUBLIC_KEY = os.getenv('PAYGREEN_PUBLIC_KEY', 'default-public-key')
+PAYGREEN_PRIVATE_KEY = os.getenv('PAYGREEN_PRIVATE_KEY', 'default-private-key')
+PAYGREEN_ENDPOINT = os.getenv('PAYGREEN_ENDPOINT', 'https://default-paygreen-url.com')

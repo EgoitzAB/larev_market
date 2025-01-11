@@ -1,11 +1,7 @@
-<!-- detalle.html -->
-
 {% extends 'page/base.html' %}
 
 {% block navbar %}
-
 {% include 'page/navbar.html' %}
-
 {% endblock navbar %}
 
 {% block content %}
@@ -23,18 +19,17 @@
             <h4>{{ variante.nombre }}</h4>
             <p>Precio: {{ variante.precio }} | Stock: {{ variante.stock }}</p>
             <img src="{{ variante.get_imagen1.url }}" alt="{{ variante.nombre }}">
+            <form method="post" action="{% url 'carrito:carrito_añadir' variante.id %}">
+                {% csrf_token %}
+                {{ formulario_carrito.as_p }}
+                <button type="submit">Añadir al carrito</button>
+            </form>
         </li>
         {% endfor %}
     </ul>
 {% else %}
     <p>No hay variantes disponibles para este producto.</p>
 {% endif %}
-
-<!-- Formulario para añadir al carrito -->
-<form method="post">
-    {{ formulario_carrito.as_p }}
-    <button type="submit">Añadir al carrito</button>
-</form>
 
 <h3>Productos Recomendados</h3>
 <div class="productos-recomendados">

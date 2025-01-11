@@ -3,6 +3,11 @@ from django.conf import settings
 from tienda.models import Producto
 
 
+from decimal import Decimal
+from django.conf import settings
+from tienda.models import Producto, ProductoVariante
+
+
 class Carrito:
     def __init__(self, request):
         """
@@ -13,19 +18,17 @@ class Carrito:
         if not carrito:
             carrito = self.session[settings.CARRITO_SESSION_ID] = {}
         self.carrito = carrito
-        # store current applied coupon
-#        self.coupon_id = self.session.get('coupon_id')
 
     def __iter__(self):
         """
-        Iterar sobre los productos y recuperarlos de la base de datos
+        Iterar sobre los productos y recuperarlos de la base de datos.
         """
         product_ids = self.carrito.keys()
-        # get the product objects and add them to the cart
-        productos = Producto.objects.filter(id__in=product_ids)
+        productos = ProductoVariante.objects.filter(id__in=product_ids)
         carrito = self.carrito.copy()
         for producto in productos:
             carrito[str(producto.id)]['producto'] = producto
+            carrito[str(producto.id)]['stock'] = producto.stock  # Agregar stock de la variante
         for item in carrito.values():
             item['precio'] = Decimal(item['precio'])
             item['precio_total'] = item['precio'] * item['cantidad']
@@ -39,21 +42,23 @@ class Carrito:
 
     def añadir(self, producto, cantidad=1, sobreescribir=False):
         """
-        Añade un producto o actualiza su cantidad.
+        Añade un producto o actualiza su cantidad. Ajusta según disponibilidad.
         """
         producto_id = str(producto.id)
         if producto_id not in self.carrito:
-            self.carrito[producto_id] = {'cantidad': 0,
-                                    'precio': str(producto.precio)}
-        if sobreescribir:
-            self.carrito[producto_id]['cantidad'] = cantidad
-        else:
-            self.carrito[producto_id]['cantidad'] += cantidad
-        self.save()
+            self.carrito[producto_id] = {'cantidad': 0, 'precio': str(producto.precio)}
 
-    def save(self):
-        # marcar la sesión cómo modificada para qué funcione
-        self.session.modified = True
+        if sobreescribir:
+            nueva_cantidad = cantidad
+        else:
+            nueva_cantidad = self.carrito[producto_id]['cantidad'] + cantidad
+
+        # Chequear disponibilidad de stock
+        if nueva_cantidad > producto.stock:
+            nueva_cantidad = producto.stock  # Ajustar al máximo disponible
+
+        self.carrito[producto_id]['cantidad'] = nueva_cantidad
+        self.save()
 
     def eliminar(self, producto):
         """
@@ -65,12 +70,23 @@ class Carrito:
             self.save()
 
     def limpiar(self):
-        # eliminar el carrito de la session
+        """
+        Eliminar el carrito de la sesión.
+        """
         del self.session[settings.CARRITO_SESSION_ID]
         self.save()
 
     def carrito_total(self):
+        """
+        Calcular el total del carrito.
+        """
         return sum(Decimal(item['precio']) * item['cantidad'] for item in self.carrito.values())
+
+    def save(self):
+        """
+        Marcar la sesión como modificada para asegurar que los cambios se guarden.
+        """
+        self.session.modified = True
 
 #    @property
  #   def coupon(self):
