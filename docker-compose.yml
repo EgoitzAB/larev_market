@@ -1,0 +1,30 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile  # Asegúrate de que esté en el mismo directorio que tu Dockerfile
+    container_name: django_web_dev
+    ports:
+      - "8000:8000"  # Puerto para acceder al servidor de desarrollo de Django
+    environment:
+      - DEBUG=True  # Activar el modo de depuración
+      - REDIS_HOST=redis-server  # Dirección del contenedor de Redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+    volumes:
+      - .:/app  # Montar el código fuente para facilitar cambios en desarrollo
+    depends_on:
+      - redis-server  # Asegurarse de que Redis esté disponible antes de iniciar Django
+    command: python manage.py runserver 0.0.0.0:8000  # Usar el servidor de desarrollo de Django
+
+  redis-server:
+    image: redis:latest
+    container_name: redis-server
+    command: redis-server --save 60 1 --loglevel warning
+    ports:
+      - "6379:6379"  # Puerto de Redis
+    volumes:
+      - redis-data:/data  # Persistencia de datos
+
+volumes:
+  redis-data:  # Definir el volumen para Redis
