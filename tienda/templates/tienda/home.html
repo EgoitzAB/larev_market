@@ -2,9 +2,7 @@
 {% load static %}
 
 {% block navbar %}
-
 {% include 'page/navbar.html' %}
-
 {% endblock navbar %}
     
 {% block content %}
@@ -36,21 +34,23 @@
             <div class="product-card">
                 <h3>{{ producto.nombre }}</h3>
                 {% if producto.imagen1 %}
-                <img src="{{ producto.imagen1 }}" alt="{{ producto.nombre }}">
+                <a href="{% url 'tienda:detalle_producto' producto.slug %}">
+                    <img src="{{ producto.imagen1 }}" alt="{{ producto.nombre }}">
+                </a>
                 {% else %}
                 <p>Imagen no disponible</p>
                 {% endif %}
-                <p>{{ producto.descripcion }}</p>
                 <div class="variants">
                     {% for variante in producto.variantes %}
                     <div class="variant">
                         <p>{{ variante.nombre }}</p>
                         <p>Precio: €{{ variante.precio }}</p>
-                        <p>Stock: {{ variante.stock }}</p>
                         {% if variante.peso %}<p>Peso: {{ variante.peso }} g</p>{% endif %}
                         {% if variante.talla %}<p>Talla: {{ variante.talla }}</p>{% endif %}
                         {% if variante.imagen1 %}
-                        <img src="{{ variante.imagen1 }}" alt="{{ variante.nombre }}">
+                        <a href="{% url 'tienda:detalle_variante' producto.slug variante.id %}">
+                            <img src="{{ variante.imagen1 }}" alt="{{ variante.nombre }}">
+                        </a>
                         {% else %}
                         <p>Imagen no disponible</p>
                         {% endif %}
@@ -73,4 +73,5 @@
 </script>
 
 {% endblock %}
+
 

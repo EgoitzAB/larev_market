@@ -7,14 +7,17 @@ def productos_por_categoria(request):
             {
                 'id': producto.id,
                 'nombre': producto.nombre,
+                'slug': producto.slug,
                 'descripcion': producto.descripcion,
                 'imagen1': producto.imagen1.url if producto.imagen1 else None,
                 'variantes': [
                     {
                         'id': variante.id,
+                        'sku': variante.sku,
                         'nombre': variante.nombre,
                         'precio': str(variante.precio),
                         'stock': variante.stock,
+                        'slug': variante.slug,
                         'peso': variante.peso,
                         'talla': variante.talla,
                         'imagen1': variante.get_imagen1().url if variante.get_imagen1() else None,

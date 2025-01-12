@@ -1,45 +1,64 @@
-{% extends 'page/base.html' %}
-
-{% block navbar %}
-{% include 'page/navbar.html' %}
-{% endblock navbar %}
+{% extends "page/base.html" %}
+{% load static %}
 
 {% block content %}
-<h1>{{ producto.nombre }}</h1>
-<img src="{{ producto.imagen1.url }}" alt="{{ producto.nombre }}">
-
-<p>{{ producto.descripcion }}</p>
-
-<!-- Variantes del producto -->
-{% if variantes %}
-    <h3>Variantes disponibles</h3>
-    <ul>
+<div class="product-detail">
+    <!-- Mostrar detalles del producto principal -->
+    <h1>{{ producto_principal.nombre }}</h1>
+    
+    {% if producto_principal.imagen1 %}
+    <img src="{{ producto_principal.imagen1.url }}" alt="{{ producto_principal.nombre }}">
+    {% endif %}
+    
+    <p>Descripción: {{ producto_principal.descripcion }}</p>
+    
+    <!-- Variantes -->
+    {% if variantes|length > 1 %}
+    <h2>Variantes disponibles</h2>
+    <div class="variant-grid">
         {% for variante in variantes %}
-        <li>
-            <h4>{{ variante.nombre }}</h4>
-            <p>Precio: {{ variante.precio }} | Stock: {{ variante.stock }}</p>
-            <img src="{{ variante.get_imagen1.url }}" alt="{{ variante.nombre }}">
-            <form method="post" action="{% url 'carrito:carrito_añadir' variante.id %}">
-                {% csrf_token %}
-                {{ formulario_carrito.as_p }}
-                <button type="submit">Añadir al carrito</button>
-            </form>
-        </li>
+        <div class="variant-card">
+            <h3>{{ variante.nombre }}</h3>
+            <p>Precio: €{{ variante.precio }}</p>
+            {% if variante.peso %}
+            <p>Peso: {{ variante.peso }} g</p>
+            {% endif %}
+            {% if variante.talla %}
+            <p>Talla: {{ variante.talla }}</p>
+            {% endif %}
+            {% if variante.imagen1 %}
+            <a href="{% url 'tienda:detalle_variante' producto_principal.slug variante.id %}">
+                <img src="{{ variante.imagen1.url }}" alt="{{ variante.nombre }}">
+            </a>
+            {% endif %}
+        </div>
         {% endfor %}
-    </ul>
-{% else %}
-    <p>No hay variantes disponibles para este producto.</p>
-{% endif %}
-
-<h3>Productos Recomendados</h3>
-<div class="productos-recomendados">
-    {% for producto in productos_recomendados %}
-    <div class="producto-recomendado">
-        <a href="{% url 'tienda:detalle_producto' producto.slug %}">
-            <img src="{{ producto.imagen1.url }}" alt="{{ producto.nombre }}">
-            <h4>{{ producto.nombre }}</h4>
-        </a>
     </div>
-    {% endfor %}
+    {% endif %}
+    
+    <!-- Formulario para añadir al carrito -->
+    <form method="post" action="{% url 'carrito:carrito_añadir' producto_principal.id %}">
+        {% csrf_token %}
+        {{ formulario_carrito.as_p }}
+        <button type="submit">Añadir al carrito</button>
+    </form>
+    
+    <!-- Productos recomendados -->
+    {% if productos_recomendados %}
+    <h2>Productos Recomendados</h2>
+    <div class="recommended-grid">
+        {% for recomendado in productos_recomendados %}
+        <div class="recommended-card">
+            <a href="{% url 'tienda:detalle_producto' recomendado.slug %}">
+                <h3>{{ recomendado.nombre }}</h3>
+                {% if recomendado.imagen1 %}
+                <img src="{{ recomendado.imagen1.url }}" alt="{{ recomendado.nombre }}">
+                {% endif %}
+            </a>
+            <p>Precio: €{{ recomendado.precio }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

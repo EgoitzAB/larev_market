@@ -52,30 +52,40 @@ class ProductoDetalleView(DetailView):
     template_name = 'tienda/detalle.html'
     
     def get_object(self):
-        # Filtrar el producto por su slug y solo mostrar los productos activos
+        # Si el `variante_id` está presente en la URL, buscar la variante específica
+        if 'variante_id' in self.kwargs:
+            return get_object_or_404(ProductoVariante, id=self.kwargs['variante_id'], producto__slug=self.kwargs['slug'], producto__is_active=True)
+        
+        # Si no, retornar el producto principal
         return get_object_or_404(Producto, slug=self.kwargs['slug'], is_active=True)
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # Obtener el producto actual
-        producto = self.get_object()
+        # Obtener el objeto actual (puede ser Producto o ProductoVariante)
+        objeto = self.get_object()
 
-        # Obtener las variantes del producto, si las hay
-        variantes = ProductoVariante.objects.filter(producto=producto)
+        if isinstance(objeto, Producto):
+            # Si es un producto principal, incluir sus variantes
+            variantes = ProductoVariante.objects.filter(producto=objeto)
+        else:
+            # Si es una variante, incluir solo la variante seleccionada
+            variantes = [objeto]
 
         # Crear el formulario para añadir al carrito
         formulario_carrito = CarritoAñadirProductoForm()
 
-        # Obtener productos recomendados (suponiendo que tienes un sistema de recomendaciones)
+        # Obtener productos recomendados basados en el producto principal
+        producto_principal = objeto.producto if isinstance(objeto, ProductoVariante) else objeto
         r = Recomendador()
-        productos_recomendados = r.recomendar_productos_para([producto], 4)
+        productos_recomendados = r.recomendar_productos_para([producto_principal], 4)
 
         # Agregar todos estos datos al contexto
         context.update({
             'formulario_carrito': formulario_carrito,
             'productos_recomendados': productos_recomendados,
             'variantes': variantes,
+            'producto_principal': producto_principal,
         })
 
         return context
