@@ -79,7 +79,7 @@ Tienda de productos de CBD, página principal
                 <div class="variants">
                     {% for variante in producto.variantes %}
                     <div class="variant" data-price="{{ variante.precio }}">
-                        <p>Variante: {{ variante.nombre }}</p>
+                        <p>Variante: {{ variante.nombre }}</p> <!-- habrá que eliminarlo luego, tras pruebas-->
                         <p>Precio: €{{ variante.precio }}</p>
                         
                         <!-- Mostrar peso solo si está presente -->
@@ -92,15 +92,15 @@ Tienda de productos de CBD, página principal
                         {% endif %}
                         
                         <!-- Formulario de adición al carrito -->
-                        <form method="post" action="{% url 'carrito:carrito_añadir' producto_id=producto.id %}">
+                        <form method="post" action="{% url 'carrito:carrito_añadir' producto_id=variante.id %}">
                             {% csrf_token %}
                             <input type="hidden" name="cantidad" value="1">
                             <input type="hidden" name="variante_id" value="{{ variante.id }}">
                             <input type="hidden" name="sobreescribir" value="false">
-                            <button type="submit" class="btn btn-success">Añadir al carrito</button>
-                        </form>
+                            <button type="submit" class="btn btn-success {% if variante.stock <= 0 %}btn-disabled{% endif %}" {% if variante.stock <= 0 %}disabled{% endif %}>
+                                {% if variante.stock > 0 %}Añadir al carrito{% else %}No hay stock{% endif %}
+                            </button>
                     </div>
-                    
                     {% endfor %}
                 </div>
             </div>
