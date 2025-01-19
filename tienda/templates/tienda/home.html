@@ -1,16 +1,11 @@
 {% extends "page/base.html" %}
 {% load static %}
 
-
 {% block title %}
 Tienda de productos de CBD, página principal
 {% endblock title %}
 
-{% block body_class %} {% endblock body_class %}>
-
-
-
-
+{% block body_class %} {% endblock body_class %}
 
 {% block navbar %}
 {% include 'page/navbar.html' %}
@@ -35,74 +30,88 @@ Tienda de productos de CBD, página principal
     </div>
 </div>
 {% endif %}
-    <!-- Ordenación -->
-    <div class="sort-options my-3">
-        <label for="sortOrder" class="form-label">Ordenar por:</label>
-        <select id="sortOrder" class="form-select w-auto" onchange="ordenarProductos()">
-            <option value="precio_asc">Precio: Menor a mayor</option>
-            <option value="precio_desc">Precio: Mayor a menor</option>
-            <option value="novedades">Novedades</option>
-            <option value="popularidad">Popularidad</option>
-        </select>
-    </div>
-    <div class="category-buttons my-3 d-flex flex-wrap gap-2">
-        {% for categoria, _ in productos_por_categoria_json.items %}
-        <button class="btn btn-outline-success rounded-pill category-btn" data-category="{{ categoria|slugify }}">
-            {{ categoria }}
-        </button>
-        {% endfor %}
-    </div>
-    <section>
-        {% for categoria, productos in productos_por_categoria_json.items %}
-        <div id="{{ categoria|slugify }}">
-            <h2>{{ categoria }}</h2>
-            {% if productos %}
-            <div class="product-grid">
-                {% for producto in productos %}
-                <div class="product-card">
-                    <h3>{{ producto.nombre }}</h3>
-                    {% if producto.imagen1 %}
-                    <a href="{% url 'tienda:detalle_producto' producto.slug %}">
-                        <img src="{{ producto.imagen1 }}" alt="{{ producto.nombre }}">
-                    </a>
-                    {% else %}
-                    <p>Imagen no disponible</p>
-                    {% endif %}
-                    <div class="variants">
-                        {% for variante in producto.variantes %}
-                        <div class="variant" 
-                             data-price="{{ variante.precio }}" 
-                             data-weight="{{ variante.peso|default:0 }}" 
-                             onclick="document.getElementById('form-{{ variante.id }}').submit();">
-                            <p>Variante: {{ variante.nombre }}</p>
-                            <p>Precio: €{{ variante.precio }}</p>
-                            {% if variante.peso %}
-                            <p>Peso: {{ variante.peso }} g</p>
-                            {% endif %}
-                            {% if variante.talla %}
-                            <p>Talla: {{ variante.talla }}</p>
-                            {% endif %}
-                            <!-- Formulario oculto con la acción POST -->
-                            <form id="form-{{ variante.id }}" method="post" action="{% url 'carrito:carrito_añadir' producto_id=variante.id %}">
-                                {% csrf_token %}
-                                <!-- Campo oculto con la cantidad predefinida a 1 -->
-                                <input type="hidden" name="cantidad" value="1">
-                                <input type="hidden" name="variante_id" value="{{ variante.id }}">
-                                <input type="hidden" name="sobreescribir" value="false"> <!-- Puedes ajustarlo si es necesario -->
-                            </form>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <p>Sin productos en esta categoría</p>
-            {% endif %}
+
+<!-- Contenedor con margen -->
+<div class="container my-4">
+    <!-- Contenedor para ordenación y botones de categoría -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <!-- Ordenación -->
+        <div class="sort-options d-flex align-items-center gap-3">
+            <label for="sortOrder" class="form-label m-0 fw-bold">Ordenar por:</label>
+            <select id="sortOrder" class="form-select form-select-sm w-auto" onchange="ordenarProductos()">
+                <option value="precio_asc">Precio: Menor a mayor</option>
+                <option value="precio_desc">Precio: Mayor a menor</option>
+                <option value="novedades">Novedades</option>
+                <option value="popularidad">Popularidad</option>
+            </select>
         </div>
-        {% endfor %}
-    </section>
-    
+
+        <!-- Botones de categorías -->
+        <div class="category-buttons my-3 d-flex flex-wrap gap-2">
+            <button class="btn btn-outline-success rounded-pill category-btn" data-category="all">
+                Todo
+            </button>
+            {% for categoria, _ in productos_por_categoria_json.items %}
+            <button class="btn btn-outline-success rounded-pill category-btn" data-category="{{ categoria|slugify }}">
+                {{ categoria|title }}
+            </button>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<section>
+    {% for categoria, productos in productos_por_categoria_json.items %}
+    <div id="{{ categoria|slugify }}" class="category-section">
+        <h2 class="text-success text-center my-4 py-2 border-bottom">{{ categoria|title }}</h2>            
+        {% if productos %}
+        <div class="product-grid">
+            {% for producto in productos %}
+            <div class="product-card">
+                {% if producto.imagen1 %}
+                <a href="{% url 'tienda:detalle_producto' producto.slug %}">
+                    <img src="{{ producto.imagen1 }}" alt="{{ producto.nombre }}">
+                </a>
+                {% else %}
+                <p>Imagen no disponible</p>
+                {% endif %}
+                <h3>{{ producto.nombre }}</h3>
+                <div class="variants">
+                    {% for variante in producto.variantes %}
+                    <div class="variant" data-price="{{ variante.precio }}">
+                        <p>Variante: {{ variante.nombre }}</p>
+                        <p>Precio: €{{ variante.precio }}</p>
+                        
+                        <!-- Mostrar peso solo si está presente -->
+                        {% if variante.peso %}
+                        <p>Peso: {{ variante.peso }} g</p>
+                        {% endif %}
+                        
+                        {% if variante.talla %}
+                        <p>Talla: {{ variante.talla }}</p>
+                        {% endif %}
+                        
+                        <!-- Formulario de adición al carrito -->
+                        <form method="post" action="{% url 'carrito:carrito_añadir' producto_id=producto.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="cantidad" value="1">
+                            <input type="hidden" name="variante_id" value="{{ variante.id }}">
+                            <input type="hidden" name="sobreescribir" value="false">
+                            <button type="submit" class="btn btn-success">Añadir al carrito</button>
+                        </form>
+                    </div>
+                    
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>Sin productos en esta categoría</p>
+        {% endif %}
+    </div>
+    {% endfor %}
+</section>
 
 <!-- Exponer los datos como JSON para manipular con JS -->
 <script>
