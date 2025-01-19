@@ -4,51 +4,55 @@ from .models import Direccion
 from pagos.models import Orden, ItemOrden
 from .forms import DireccionForm
 from carrito.carrito import Carrito
+from django.shortcuts import redirect
 
 def checkout(request):
     carrito = Carrito(request)
-    direcciones = Direccion.objects.filter(usuario=request.user)
+    direcciones = None
+
+    if request.user.is_authenticated:
+        # Solo buscar direcciones si el usuario está autenticado
+        direcciones = Direccion.objects.filter(usuario=request.user)
 
     if request.method == 'POST':
+        if not request.user.is_authenticated:
+            # Redirigir al inicio de sesión si no está autenticado
+            return redirect('account_login')  # Ajusta esta URL según tu configuración
+
         direccion_id = request.POST.get('direccion_id')
+        direccion = None
+
         if direccion_id:
+            # Obtiene la dirección seleccionada por el usuario
             direccion = get_object_or_404(Direccion, id=direccion_id, usuario=request.user)
         else:
+            # Si no seleccionó una dirección existente, intenta crear una nueva
             direccion_form = DireccionForm(request.POST)
             if direccion_form.is_valid():
                 direccion = direccion_form.save(commit=False)
                 direccion.usuario = request.user
                 direccion.save()
             else:
+                # Devuelve el formulario con errores si no es válido
                 return render(request, 'checkout/checkout.html', {
                     'form': direccion_form,
                     'carrito': carrito,
                     'direcciones': direcciones,
                 })
 
-        # Crear la orden
-        orden = Orden.objects.create(
-            cliente=request.user,
-            direccion_envio=direccion,
-            total=carrito.carrito_total(),
-            estado='pendiente',
-        )
+        # Crear la orden utilizando el método del modelo Orden
+        orden = Orden.crear_orden(cliente=request.user, direccion_envio=direccion, carrito=carrito)
 
-        # Crear los items de la orden
-        for item in carrito:
-            ItemOrden.objects.create(
-                orden=orden,
-                producto=item['producto'],
-                cantidad=item['cantidad'],
-                precio_unitario=item['precio'],
-            )
-
+        # Limpia el carrito después de crear la orden
         carrito.limpiar()
-        return redirect('pagos:paygreen_iniciar_pago', orden_id=orden.id)
+
+        # Redirige al flujo de pago
+        return redirect('pagos:realizar_compra', orden_id=orden.id)
 
     else:
         direccion_form = DireccionForm()
 
+    # Renderiza la vista del formulario de checkout
     return render(
         request,
         'checkout/checkout.html',

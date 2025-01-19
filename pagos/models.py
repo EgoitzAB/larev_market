@@ -21,6 +21,34 @@ class Orden(models.Model):
     def __str__(self):
         return f"Orden #{self.id} - {self.cliente.username}"
 
+    @classmethod
+    def crear_orden(cls, cliente, direccion_envio, carrito):
+        """
+        Método de clase para crear una orden con sus items, manejando correctamente las variantes de producto.
+        """
+        # Calcula el total del carrito
+        total = carrito.carrito_total()
+
+        # Crea la orden principal
+        orden = cls.objects.create(
+            cliente=cliente,
+            direccion_envio=direccion_envio,
+            total=total,
+            estado='pendiente',
+        )
+
+        # Agrega los items de la orden
+        for item in carrito:
+            producto_variante = item['producto']  # Se espera que sea una instancia de ProductoVariante
+            ItemOrden.objects.create(
+                orden=orden,
+                producto=producto_variante,
+                cantidad=item['cantidad'],
+                precio_unitario=item['precio'],
+            )
+
+        return orden
+
 
 class ItemOrden(models.Model):
     orden = models.ForeignKey(Orden, related_name='items', on_delete=models.CASCADE)
@@ -30,6 +58,7 @@ class ItemOrden(models.Model):
 
     def __str__(self):
         return f"{self.cantidad} x {self.producto.nombre}"
+
 
 class Pago(models.Model):
     orden = models.OneToOneField(Orden, related_name='pago', on_delete=models.CASCADE)

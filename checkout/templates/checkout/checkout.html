@@ -1,8 +1,9 @@
 <h1>Checkout</h1>
 
+<!-- Formulario para seleccionar una dirección existente -->
 <form method="post">
     {% csrf_token %}
-    
+
     <h2>Seleccionar Dirección</h2>
     {% if direcciones.exists %}
         <ul>
@@ -16,16 +17,27 @@
                 </li>
             {% endfor %}
         </ul>
+        <!-- Botón para usar la dirección seleccionada -->
+        <button type="submit">Usar esta Dirección</button>
     {% else %}
         <p>No tienes direcciones guardadas. Por favor ingresa una nueva.</p>
     {% endif %}
-
-    <h2>Ingresar Nueva Dirección</h2>
-    {{ form.as_p }}
-
-    <button type="submit">Continuar al Pago</button>
 </form>
 
+<hr>
+
+<!-- Formulario para ingresar una nueva dirección -->
+<h2>Ingresar Nueva Dirección</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <!-- Botón para guardar la nueva dirección y continuar -->
+    <button type="submit">Guardar Dirección y Continuar al Pago</button>
+</form>
+
+<hr>
+
+<!-- Resumen del Carrito -->
 <h2>Resumen del Carrito</h2>
 <table>
     <thead>
