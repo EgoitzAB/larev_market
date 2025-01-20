@@ -1,4 +1,5 @@
 {% load static %}
+{% load carrito_tags %}
 <div class="container-fluid fixed-top">
     <!-- Top bar -->
     <div class="container-fluid topbar bg-warning d-none d-lg-block">
@@ -86,7 +87,7 @@
                     <li class="nav-item">
                         <a href="{% url 'carrito:carrito_detalle' %}" class="nav-link">
                             <i class="fas fa-shopping-cart"></i> <!-- Usando Font Awesome -->
-                            <span class="badge bg-dark text-white ms-1 rounded-pill">{{ request.session.carrito|length }}</span>
+                            <span class="badge bg-dark text-white ms-1 rounded-pill">{{ request.session.carrito|total_unidades }}</span>
                         </a>
                     </li>                                
                     <!-- User Icon -->

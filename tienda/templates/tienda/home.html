@@ -100,6 +100,7 @@ Tienda de productos de CBD, página principal
                             <button type="submit" class="btn btn-success {% if variante.stock <= 0 %}btn-disabled{% endif %}" {% if variante.stock <= 0 %}disabled{% endif %}>
                                 {% if variante.stock > 0 %}Añadir al carrito{% else %}No hay stock{% endif %}
                             </button>
+                        </form>
                     </div>
                     {% endfor %}
                 </div>
