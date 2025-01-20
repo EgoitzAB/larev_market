@@ -7,7 +7,7 @@
             <div class="top-info ps-2">
                 <small class="me-3">
                     <i class="fas fa-map-marker-alt me-2 text-secondary"></i>
-                    <a href="#" class="text-white">123 Street, New York</a>
+                    <a href="#" class="text-white">Calle San Francisco, San Sebastián</a>
                 </small>
                 <small class="me-3">
                     <i class="fas fa-envelope me-2 text-secondary"></i>
@@ -53,7 +53,7 @@
                             {% for producto in productos %}
                             <li>
                                 <a class="dropdown-item" 
-                                   href="{% url 'tienda:listado_producto' %}?producto={{ producto.nombre|urlencode }}">
+                                   href="{% url 'tienda:detalle_producto' producto.slug %}">
                                    {{ producto.nombre }}
                                 </a>
                             </li>
