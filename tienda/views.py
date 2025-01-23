@@ -1,8 +1,10 @@
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import TemplateView, ListView, DetailView
 from .models import Categoria, Producto, ProductoVariante
 from carrito.forms import CarritoAñadirProductoForm
 from .recomendador import Recomendador
+from django.contrib.postgres.search import TrigramSimilarity
+from django.db.models import Q
 
 class HomeView(TemplateView):
     template_name = "tienda/home.html"
@@ -93,3 +95,44 @@ class ProductoDetalleView(DetailView):
 
         return context
 
+def buscar_productos_y_variantes(query, umbral=0.3):
+    """
+    Busca productos y variantes que coincidan con la consulta.
+    :param query: Término de búsqueda.
+    :param umbral: Umbral de similitud para TrigramSimilarity (por defecto 0.3).
+    :return: Lista de productos y variantes ordenados por relevancia.
+    """
+
+    query = str(query)
+    # Búsqueda en Producto
+    productos = Producto.objects.annotate(
+        similitud_nombre=TrigramSimilarity('nombre', query),
+        similitud_descripcion=TrigramSimilarity('descripcion', query),
+    ).filter(
+        Q(similitud_nombre__gt=umbral) | Q(similitud_descripcion__gt=umbral)
+    ).order_by('-similitud_nombre', '-similitud_descripcion')
+
+    # Búsqueda en ProductoVariante
+    variantes = ProductoVariante.objects.annotate(
+        similitud_nombre=TrigramSimilarity('nombre', query),
+    ).filter(
+        Q(similitud_nombre__gt=umbral)
+    ).order_by('-similitud_nombre')
+
+    # Combinar resultados
+    resultados = list(productos) + list(variantes)
+    resultados.sort(key=lambda x: getattr(x, 'similitud_nombre', 0), reverse=True)
+
+    return resultados
+
+def buscar(request):
+    query = request.GET.get('q', '')  # Obtener el término de búsqueda desde la URL
+    resultados = []
+
+    if query:
+        resultados = buscar_productos_y_variantes(query)
+
+    return render(request, 'tienda/resultados_busqueda.html', {
+        'resultados': resultados,
+        'query': query,
+    })

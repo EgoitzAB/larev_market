@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'django.contrib.postgres',
     'debug_toolbar',
 
     'allauth',
@@ -65,9 +66,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
-#    "core.middleware.EmailMFAMiddleware", # email 2fa middlware
+#    "core.middleware.EmailM,FAMiddleware", # email 2fa middlware
     'tienda.middleware.VerificacionEdadMiddleware',
-    "allauth.account.middleware.AccountMiddleware",
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 INTERNAL_IPS = [ '127.0.0.1',]

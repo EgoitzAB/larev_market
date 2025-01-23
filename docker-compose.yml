@@ -2,29 +2,49 @@ services:
   web:
     build:
       context: .
-      dockerfile: Dockerfile  # Asegúrate de que esté en el mismo directorio que tu Dockerfile
+      dockerfile: Dockerfile
     container_name: django_web_dev
     ports:
-      - "8000:8000"  # Puerto para acceder al servidor de desarrollo de Django
+      - "8000:8000"
     environment:
-      - DEBUG=True  # Activar el modo de depuración
-      - REDIS_HOST=redis-server  # Dirección del contenedor de Redis
+      - DEBUG=True
+      - DB_ENGINE=django.db.backends.postgresql
+      - DB_NAME=${POSTGRES_DB}
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_HOST=db
+      - DB_PORT=5432
+      - REDIS_HOST=redis-server
       - REDIS_PORT=6379
       - REDIS_DB=0
     volumes:
-      - .:/app  # Montar el código fuente para facilitar cambios en desarrollo
+      - .:/app
     depends_on:
-      - redis-server  # Asegurarse de que Redis esté disponible antes de iniciar Django
-    command: python manage.py runserver 0.0.0.0:8000  # Usar el servidor de desarrollo de Django
+      - db
+      - redis-server
+    command: sh -c "./wait-for-it.sh db:5432 -- python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+  db:
+    image: postgres:13
+    container_name: postgres_db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # Montar el script de inicialización
+    ports:
+      - "5432:5432"
 
   redis-server:
     image: redis:latest
     container_name: redis-server
     command: redis-server --save 60 1 --loglevel warning
     ports:
-      - "6379:6379"  # Puerto de Redis
+      - "6379:6379"
     volumes:
-      - redis-data:/data  # Persistencia de datos
+      - redis-data:/data
 
 volumes:
-  redis-data:  # Definir el volumen para Redis
+  postgres_data:
+  redis-data:

@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import verify_email_mfa, InfoTiendaView, TerminosDeUsoView, PrivacidadView, perfil
+from django.views.generic.base import TemplateView
 
 app_name = 'core'
 
@@ -9,5 +10,6 @@ urlpatterns = [
     path('terminos-de-uso/', TerminosDeUsoView.as_view(), name='terminos_de_uso'),
     path('politica-de-privacidad/', PrivacidadView.as_view(), name='politica_de_privacidad'),
     path('perfil/', perfil, name='perfil'),
-
+    path("robots.txt", TemplateView.as_view(template_name="core/robots.txt",
+                                            content_type="text/plain")),
 ]

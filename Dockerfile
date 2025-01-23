@@ -25,8 +25,11 @@ RUN mkdir -p /app/staticfiles
 # Colectar archivos estáticos (solo si es necesario en desarrollo, si no lo necesitas puedes omitirlo)
 RUN python manage.py collectstatic --noinput
 
+# Variables de entorno para Django
+ENV PYTHONUNBUFFERED=1
+ENV DJANGO_SETTINGS_MODULE=larev.settings 
 # Exponer el puerto del contenedor
 EXPOSE 8000
 
 # Especificar el comando para ejecutar Django en modo desarrollo
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["sh", "-c", "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]

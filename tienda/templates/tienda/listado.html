@@ -1,38 +1,43 @@
-<!-- listado.html -->
-
 {% extends 'page/base.html' %}
+{% load static %}
 
 {% block navbar %}
-
 {% include 'page/navbar.html' %}
-
 {% endblock navbar %}
 
 {% block content %}
-<h1>Productos</h1>
+<div class="container my-5">
+    <h1 class="text-success mb-4">Productos</h1>
 
-<!-- Filtros de Categorías -->
-<div>
-    <h3>Categorías</h3>
-    <ul>
-        {% for categoria in categorias %}
-            <li><a href="?categoria={{ categoria.nombre }}">{{ categoria.nombre }}</a></li>
-        {% endfor %}
-    </ul>
-</div>
-
-<!-- Productos -->
-<div class="productos">
-    <h2>Productos</h2>
-    <div class="productos-lista">
-        {% for producto in productos %}
-        <div class="producto-item">
-            <a href="{% url 'tienda:detalle_producto' producto.slug %}">
-                <img src="{{ producto.imagen1.url }}" alt="{{ producto.nombre }}">
-                <h3>{{ producto.nombre }}</h3>
-            </a>
+    <!-- Filtros de Categorías -->
+    <div class="category-buttons mb-5">
+        <h3 class="text-success mb-3">Categorías</h3>
+        <div class="d-flex flex-wrap gap-2">
+            {% for categoria in categorias %}
+                <a href="?categoria={{ categoria.nombre }}" class="btn btn-outline-success category-btn">
+                    {{ categoria.nombre }}
+                </a>
+            {% endfor %}
         </div>
-        {% endfor %}
+    </div>
+
+    <!-- Productos -->
+    <div class="productos">
+        <h2 class="text-success mb-4">Productos</h2>
+        <div class="product-grid">
+            {% for producto in productos %}
+            <div class="product-card">
+                <a href="{% url 'tienda:detalle_producto' producto.slug %}">
+                    {% if producto.imagen1 %}
+                    <img src="{{ producto.imagen1.url }}" alt="{{ producto.nombre }}" class="product-image">
+                    {% else %}
+                    <img src="{% static 'images/no-image-available.png' %}" alt="Imagen no disponible" class="product-image">
+                    {% endif %}
+                    <h3 class="text-success mt-3">{{ producto.nombre }}</h3>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
     </div>
 </div>
 {% endblock %}

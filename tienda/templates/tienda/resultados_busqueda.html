@@ -1,0 +1,35 @@
+{% extends 'page/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-success mb-4">Resultados de búsqueda para "{{ query }}"</h1>
+
+    {% if resultados %}
+        <div class="product-grid">
+            {% for resultado in resultados %}
+                <div class="product-card">
+                    {% if resultado.imagen1 %}
+                        <img src="{{ resultado.imagen1.url }}" alt="{{ resultado.nombre }}" class="product-image">
+                    {% else %}
+                        <img src="{% static 'images/no-image-available.png' %}" alt="Imagen no disponible" class="product-image">
+                    {% endif %}
+                    <h3 class="text-success mt-3">{{ resultado.nombre }}</h3>
+                    <p class="text-muted">
+                        {% if resultado.descripcion %}
+                            {{ resultado.descripcion|truncatechars:100 }}
+                        {% elif resultado.peso %}
+                            Peso: {{ resultado.peso }} g
+                        {% elif resultado.talla %}
+                            Talla: {{ resultado.talla }}
+                        {% endif %}
+                    </p>
+                    <p class="text-muted">Precio: €{{ resultado.precio }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No se encontraron resultados.</p>
+    {% endif %}
+</div>
+{% endblock %}
