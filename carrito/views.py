@@ -29,11 +29,23 @@ def carrito_eliminar(request, producto_id):
     carrito = Carrito(request)
     producto = get_object_or_404(ProductoVariante, id=producto_id)
     carrito.eliminar(producto)
+
+        # Verificar si el carrito quedó vacío después de eliminar el producto
+    if not carrito:
+        messages.info(request, "Has eliminado todos los productos de tu carrito. Serás redirigido a la página de inicio.")
+        return redirect('tienda:home')  # Redirigir a la página de inicio
+    
     return redirect('carrito:carrito_detalle')
 
 
 def carrito_detalle(request):
     carrito = Carrito(request)
+
+        # Verificar si el carrito está vacío
+    if not carrito:
+        messages.warning(request, "Tu carrito está vacío. Por favor, añade productos antes de ver el detalle.")
+        return redirect('tienda:home')  # Redirigir a la página de inicio
+    
     for item in carrito:
         item['FormActualizarProducto'] = CarritoAñadirProductoForm(initial={
                             'cantidad': item['cantidad'],

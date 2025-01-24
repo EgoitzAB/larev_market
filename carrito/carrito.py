@@ -33,6 +33,13 @@ class Carrito:
             item['precio'] = Decimal(item['precio'])
             item['precio_total'] = item['precio'] * item['cantidad']
             yield item
+    
+
+    def __bool__(self):
+        """
+        Devuelve True si el carrito no está vacío.
+        """
+        return bool(self.carrito)
 
     def __len__(self):
         """
