@@ -185,43 +185,26 @@ ACCOUNT_AUTHENTICATED_REDIRECT_URL = '/'
 # Redirección después del login
 LOGIN_REDIRECT_URL = '/'  # Cambiar según tu vista
 LOGOUT_REDIRECT_URL = '/'  # Cambiar según tu vista
-
+LOGIN_URL = '/accounts/login/'
 
 PAYGREEN_SHOP_ID = os.getenv('PAYGREEN_SHOP_ID', 'default-public-key')
 PAYGREEN_SECRET_KEY = os.getenv('PAYGREEN_SECRET_KEY', 'default-private-key')
 PAYGREEN_API_URL = os.getenv('PAYGREEN_API_URL', 'https://default-paygreen-url.com')
 SITE_URL = os.getenv("SITE_URL", "http://127.0.0.1:8000")
-
+GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {message}',
-            'style': '{',
-        },
-        'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
-        },
-    },
     'handlers': {
         'console': {
-            'level': 'INFO',  # Asegúrate de que el nivel de logging sea 'DEBUG' o 'INFO'
             'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
         },
     },
     'loggers': {
-        'django': {
+        '': {  # Esto captura todos los loggers
             'handlers': ['console'],
-            'level': 'INFO',  # Asegúrate de que el nivel del logger sea 'DEBUG'
-            'propagate': True,
-        },
-        'root': {
-            'handlers': ['console'],
-            'level': 'INFO',  # Aquí puedes cambiarlo a 'DEBUG' o 'INFO'
+            'level': 'DEBUG',
             'propagate': True,
         },
     },

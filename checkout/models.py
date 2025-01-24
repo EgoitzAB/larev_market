@@ -15,4 +15,4 @@ class Direccion(models.Model):
     es_direccion_envio = models.BooleanField(default=True)  # Diferenciar entre envío y facturación
 
     def __str__(self):
-        return f"{self.nombre_completo} - {self.direccion}, {self.ciudad} ({self.pais})"
+        return f"{self.nombre} - {self.direccion}, {self.ciudad} ({self.pais})"

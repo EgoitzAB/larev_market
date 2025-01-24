@@ -1,63 +1,81 @@
-<h1>Checkout</h1>
+{% extends "page/base.html" %}
+{% load static %}
 
-<!-- Formulario para seleccionar una dirección existente -->
-<form method="post">
-    {% csrf_token %}
+{% block navbar %}
+{% include 'page/navbar.html' %}
+{% endblock navbar %}
 
-    <h2>Seleccionar Dirección</h2>
-    {% if direcciones.exists %}
-        <ul>
-            {% for direccion in direcciones %}
-                <li>
-                    <label>
-                        <input type="radio" name="direccion_id" value="{{ direccion.id }}">
-                        {{ direccion.nombre_completo }}, {{ direccion.direccion }},
-                        {{ direccion.ciudad }} - {{ direccion.codigo_postal }}, {{ direccion.pais }}
-                    </label>
-                </li>
-            {% endfor %}
-        </ul>
-        <!-- Botón para usar la dirección seleccionada -->
-        <button type="submit">Usar esta Dirección</button>
-    {% else %}
-        <p>No tienes direcciones guardadas. Por favor ingresa una nueva.</p>
-    {% endif %}
-</form>
+{% block content %}
+<div class="checkout-container">
+    <h1>Checkout</h1>
 
-<hr>
+    <!-- Formulario para seleccionar una dirección existente -->
+    <form method="post" class="mb-4">
+        {% csrf_token %}
 
-<!-- Formulario para ingresar una nueva dirección -->
-<h2>Ingresar Nueva Dirección</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <!-- Botón para guardar la nueva dirección y continuar -->
-    <button type="submit">Guardar Dirección y Continuar al Pago</button>
-</form>
+        <h2 class="text-success mb-3">Seleccionar Dirección</h2>
+        {% if direcciones.exists %}
+            <ul class="list-unstyled">
+                {% for direccion in direcciones %}
+                    <li class="mb-3 p-3 bg-light rounded">
+                        <label class="d-flex align-items-center">
+                            <input type="radio" name="direccion_id" value="{{ direccion.id }}" class="me-3">
+                            <div>
+                                <strong>{{ direccion.nombre_completo }}</strong><br>
+                                {{ direccion.direccion }}, {{ direccion.ciudad }} - {{ direccion.codigo_postal }}, {{ direccion.pais }}
+                            </div>
+                        </label>
+                    </li>
+                {% endfor %}
+            </ul>
+            <!-- Botón para usar la dirección seleccionada -->
+            <button type="submit" class="btn btn-success">Usar esta Dirección</button>
+        {% else %}
+            <p class="text-muted">No tienes direcciones guardadas. Por favor ingresa una nueva.</p>
+        {% endif %}
+    </form>
 
-<hr>
+    <hr class="my-4">
 
-<!-- Resumen del Carrito -->
-<h2>Resumen del Carrito</h2>
-<table>
-    <thead>
-        <tr>
-            <th>Producto</th>
-            <th>Cantidad</th>
-            <th>Precio</th>
-            <th>Total</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for item in carrito %}
-            <tr>
-                <td>{{ item.producto.nombre }}</td>
-                <td>{{ item.cantidad }}</td>
-                <td>{{ item.precio }}</td>
-                <td>{{ item.precio_total }}</td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    <!-- Formulario para ingresar una nueva dirección -->
+    <h2 class="text-success mb-3">Ingresar Nueva Dirección</h2>
+    <form method="post" class="mb-4">
+        {% csrf_token %}
+        <div class="mb-3">
+            {{ form.as_p }}
+        </div>
+        <!-- Botón para guardar la nueva dirección y continuar -->
+        <button type="submit" class="btn btn-success">Guardar Dirección y Continuar al Pago</button>
+    </form>
 
-<h3>Total: {{ carrito.carrito_total }}</h3>
+    <hr class="my-4">
+
+    <!-- Resumen del Carrito -->
+    <h2 class="text-success mb-3">Resumen del Carrito</h2>
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead class="table-success">
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in carrito %}
+                    <tr>
+                        <td>{{ item.producto.nombre }}</td>
+                        <td>{{ item.cantidad }}</td>
+                        <td>{{ item.precio }} €</td>
+                        <td>{{ item.precio_total }} €</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h3 class="mt-4">Total: <span class="text-success">{{ carrito.carrito_total }} €</span></h3>
+</div>
+
+{% endblock content %}

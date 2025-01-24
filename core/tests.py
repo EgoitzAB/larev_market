@@ -1,10 +1,10 @@
+# core/tests.py
+from django.test import TestCase
+from django.urls import reverse
 from http import HTTPStatus
-from django.test import SimpleTestCase
 
-
-class RobotsTxtTests(SimpleTestCase):
+class RobotsTxtTests(TestCase):
     def test_get(self):
-        response = self.client.get("/robots.txt")
-
-        assert response.status_code == HTTPStatus.OK
-        assert response["content-type"] == "text/plain"
+        response = self.client.get(reverse('robots_txt'))
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(response['Content-Type'], 'text/plain')

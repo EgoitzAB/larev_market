@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.timezone import now
+from django.contrib import messages
 from .models import Direccion
 from pagos.models import Orden, ItemOrden
 from .forms import DireccionForm
@@ -10,7 +11,12 @@ def checkout(request):
     carrito = Carrito(request)
     direcciones = None
 
+    # Verificar si el carrito está vacío
+    if not carrito:
+        messages.warning(request, "Tu carrito está vacío. Por favor, añade productos antes de proceder al checkout.")
+        return redirect('tienda:home')  # Redirigir a la página de inicio
     if request.user.is_authenticated:
+
         # Solo buscar direcciones si el usuario está autenticado
         direcciones = Direccion.objects.filter(usuario=request.user)
 
@@ -40,25 +46,26 @@ def checkout(request):
                     'direcciones': direcciones,
                 })
 
-        # Crear la orden utilizando el método del modelo Orden
-        orden = Orden.crear_orden(cliente=request.user, direccion_envio=direccion, carrito=carrito)
 
-        # Limpia el carrito después de crear la orden
-        carrito.limpiar()
-
-        # Redirige al flujo de pago
-        return redirect('pagos:realizar_compra', orden_id=orden.id)
+        try:
+            # Crear la orden
+            orden = Orden.crear_orden(cliente=request.user, direccion_envio=direccion, carrito=carrito)
+            # Limpiar el carrito
+            carrito.limpiar()
+            # Redirigir al flujo de pago
+            messages.success(request, "Orden creada correctamente. Procede al pago.")
+            return redirect('pagos:realizar_compra', orden_id=orden.id)
+        except Exception as e:
+            # Manejar errores durante la creación de la orden
+            messages.error(request, f"Error al crear la orden: {str(e)}")
+            return redirect('checkout')
 
     else:
+        # Mostrar el formulario de dirección
         direccion_form = DireccionForm()
 
-    # Renderiza la vista del formulario de checkout
-    return render(
-        request,
-        'checkout/checkout.html',
-        {
-            'form': direccion_form,
-            'carrito': carrito,
-            'direcciones': direcciones,
-        }
-    )
+    return render(request, 'checkout/checkout.html', {
+        'form': direccion_form,
+        'carrito': carrito,
+        'direcciones': direcciones,
+    })
