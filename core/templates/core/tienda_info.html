@@ -4,29 +4,40 @@
 Contacto de La Revolución Verde
 {% endblock title %}
 
-{% block body_class %} {% endblock body_class %}
+{% block body_class %} 
+contact-page  <!-- Clase adicional para estilos específicos de la página de contacto -->
+{% endblock body_class %}
 
 {% block navbar %}
 {% include 'page/navbar.html' %}
 {% endblock navbar %}
 
-
 {% block content %}
-<div class="info-tienda">
-    <h1>{{ nombre_tienda }}</h1>
-    <p>{{ descripcion }}</p>
+<div class="contact-container">
+    <h1 class="contact-title">{{ nombre_tienda }}</h1>
+    <p class="contact-description">{{ descripcion }}</p>
 
-    <h2>Misión</h2>
-    <p>{{ mision }}</p>
+    <div class="mission-vision">
+        <div class="mission">
+            <h2 class="section-title">Misión</h2>
+            <p class="section-text">{{ mision }}</p>
+        </div>
 
-    <h2>Visión</h2>
-    <p>{{ vision }}</p>
+        <div class="vision">
+            <h2 class="section-title">Visión</h2>
+            <p class="section-text">{{ vision }}</p>
+        </div>
+    </div>
 
-    <h2>Nuestras Ubicaciones</h2>
-    <ul>
-        {% for ubicacion in ubicaciones %}
-            <li><strong>{{ ubicacion.ciudad }}:</strong> {{ ubicacion.direccion }}</li>
-        {% endfor %}
-    </ul>
+    <div class="locations">
+        <h2 class="section-title">Nuestras Ubicaciones</h2>
+        <ul class="locations-list">
+            {% for ubicacion in ubicaciones %}
+                <li class="location-item">
+                    <strong>{{ ubicacion.ciudad }}:</strong> {{ ubicacion.direccion }}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
 </div>
 {% endblock %}
