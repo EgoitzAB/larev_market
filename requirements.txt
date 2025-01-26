@@ -17,6 +17,7 @@ cssselect2==0.7.0
 Django==5.1.4
 django-allauth==65.3.1
 django-anymail==12.0
+django-countries==7.6.1
 django-crispy-forms==2.3
 django-debug-toolbar==4.4.6
 django-filter==24.3
@@ -49,6 +50,7 @@ six==1.17.0
 sqlparse==0.5.3
 tinycss2==1.4.0
 tinyhtml5==2.0.0
+typing_extensions==4.12.2
 tzdata==2024.2
 urllib3==2.3.0
 vine==5.1.0

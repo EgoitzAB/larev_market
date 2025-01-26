@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.mfa',
 
+    'django_countries',
+    
     'core',
     'tienda',
     'carrito',

@@ -2,6 +2,7 @@ import requests
 import logging
 from django.conf import settings
 from django.urls import reverse
+from django_countries.fields import Country
 
 
 def obtener_token_jwt():
@@ -20,10 +21,13 @@ def obtener_token_jwt():
 def crear_comprador(jwt, orden):
     """Crear un comprador en PayGreen"""
     buyer_url = f"{settings.PAYGREEN_API_URL}/payment/buyers"
+
+    country_code = str(orden.direccion_envio.pais)  # Esto da 'ES', 'US', etc.
+    
     buyer_data = {
         "billing_address": {
             "city": orden.direccion_envio.ciudad,
-            "country": orden.direccion_envio.pais,
+            "country": country_code,
             "line1": orden.direccion_envio.direccion,
             "postal_code": orden.direccion_envio.codigo_postal,
             "state": orden.direccion_envio.provincia,

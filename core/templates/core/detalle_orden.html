@@ -31,7 +31,7 @@ Detalle de la Orden #{{ orden.id }}
         </ul>
 
         <!-- Botón para continuar la compra -->
-        {% if orden.estado in 'pendiente' 'procesando' %}
+        {% if orden.estado == 'pendiente' or orden.estado == 'procesando' %}
         <form method="post" action="{% url 'core:detalle_orden' orden.id %}">
             {% csrf_token %}
             <button type="submit" name="continuar_compra" class="btn btn-success">Continuar la Compra</button>

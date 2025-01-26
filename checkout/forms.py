@@ -2,17 +2,38 @@ from django import forms
 from django.core.exceptions import ValidationError
 from .models import Direccion
 from django.conf import settings
-
+from django_countries.fields import CountryField  # Para manejar países
 import requests
 import logging
+import phonenumbers  # Para validar el teléfono
 
 logger = logging.getLogger(__name__)
 
 class DireccionForm(forms.ModelForm):
+    pais = CountryField().formfield()  # Campo de país con django-countries
+
     class Meta:
         model = Direccion
         fields = ['nombre', 'apellido', 'direccion', 'ciudad', 'codigo_postal', 
                   'provincia', 'pais', 'email', 'telefono', 'es_direccion_envio']
+
+    def clean_telefono(self):
+        """
+        Valida que el número de teléfono sea válido.
+        """
+        telefono = self.cleaned_data.get('telefono')
+        pais = self.cleaned_data.get('pais')
+
+        if telefono and pais:
+            try:
+                # Parsear el número de teléfono con el código de país
+                parsed_phone = phonenumbers.parse(telefono, pais)
+                if not phonenumbers.is_valid_number(parsed_phone):
+                    raise ValidationError("El número de teléfono no es válido para el país seleccionado.")
+            except phonenumbers.NumberParseException as e:
+                raise ValidationError(f"Error al validar el teléfono: {str(e)}")
+
+        return telefono
 
     def clean_direccion(self):
         """
@@ -53,3 +74,19 @@ class DireccionForm(forms.ModelForm):
             raise ValidationError("Error al validar la dirección. Por favor, inténtalo de nuevo más tarde.")
 
         return direccion
+
+    def clean(self):
+        """
+        Validación adicional para el formulario completo.
+        """
+        cleaned_data = super().clean()
+
+        # Verifica que el código postal sea válido (ejemplo para España)
+        codigo_postal = cleaned_data.get('codigo_postal')
+        pais = cleaned_data.get('pais')
+
+        if pais and pais == 'ES' and codigo_postal:
+            if not codigo_postal.isdigit() or len(codigo_postal) != 5:
+                raise ValidationError({'codigo_postal': 'El código postal no es válido para España.'})
+
+        return cleaned_data
