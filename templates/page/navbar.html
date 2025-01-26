@@ -44,25 +44,27 @@
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <div class="navbar-nav mx-auto">
                     {% for categoria, productos in productos_por_categoria_json.items %}
-                    <div class="nav-item dropdown">
-                        <a href="{% url 'tienda:listado_producto' %}?categoria={{ categoria|urlencode }}" 
-                           class="nav-link dropdown-toggle" 
-                           id="dropdownMenu{{ forloop.counter }}" 
-                           data-bs-toggle="dropdown" 
-                           aria-expanded="false">
-                           {{ categoria|title }}
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu{{ forloop.counter }}">
-                            {% for producto in productos %}
-                            <li>
-                                <a class="dropdown-item" 
-                                   href="{% url 'tienda:detalle_producto' producto.slug %}">
-                                   {{ producto.nombre }}
-                                </a>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
+                        {% if productos %}  <!-- Solo renderiza si hay productos en la categoría -->
+                        <div class="nav-item dropdown">
+                            <a href="{% url 'tienda:listado_producto' %}?categoria={{ categoria|urlencode }}" 
+                               class="nav-link dropdown-toggle" 
+                               id="dropdownMenu{{ forloop.counter }}" 
+                               data-bs-toggle="dropdown" 
+                               aria-expanded="false">
+                               {{ categoria|title }}
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu{{ forloop.counter }}">
+                                {% for producto in productos %}
+                                <li>
+                                    <a class="dropdown-item" 
+                                       href="{% url 'tienda:detalle_producto' producto.slug %}">
+                                       {{ producto.nombre }}
+                                    </a>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
                     {% endfor %}
                     <a href="#!" class="nav-item nav-link">Sobre nosotros</a>
                     <a href="{% url 'core:tienda_info' %}" class="nav-item nav-link">Contacto</a>

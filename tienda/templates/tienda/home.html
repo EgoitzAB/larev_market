@@ -41,6 +41,8 @@ Tienda de productos de CBD, página principal
             <select id="sortOrder" class="form-select form-select-sm w-auto" onchange="ordenarProductos()">
                 <option value="precio_asc">Precio: Menor a mayor</option>
                 <option value="precio_desc">Precio: Mayor a menor</option>
+                <option value="nombre_asc">Nombre: A a Z</option>
+                <option value="nombre_desc">Nombre: Z a A</option>
                 <option value="novedades">Novedades</option>
                 <option value="popularidad">Popularidad</option>
             </select>
@@ -51,10 +53,12 @@ Tienda de productos de CBD, página principal
             <button class="btn btn-outline-success rounded-pill category-btn" data-category="all">
                 Todo
             </button>
-            {% for categoria, _ in productos_por_categoria_json.items %}
-            <button class="btn btn-outline-success rounded-pill category-btn" data-category="{{ categoria|slugify }}">
-                {{ categoria|title }}
-            </button>
+            {% for categoria, productos in productos_por_categoria_json.items %}
+                {% if productos %}  <!-- Solo renderiza si hay productos en la categoría -->
+                <button class="btn btn-outline-success rounded-pill category-btn" data-category="{{ categoria|slugify }}">
+                    {{ categoria|title }}
+                </button>
+                {% endif %}
             {% endfor %}
         </div>
     </div>
@@ -62,63 +66,68 @@ Tienda de productos de CBD, página principal
 
 <section>
     {% for categoria, productos in productos_por_categoria_json.items %}
-    <div id="{{ categoria|slugify }}" class="category-section">
-        <h2 class="text-success text-center my-4 py-2 border-bottom">{{ categoria|title }}</h2>            
-        {% if productos %}
-        <div class="product-grid">
-            {% for producto in productos %}
-            <div class="product-card">
-                {% if producto.imagen1 %}
-                <a href="{% url 'tienda:detalle_producto' producto.slug %}">
-                    <img src="{{ producto.imagen1 }}" alt="{{ producto.nombre }}">
-                </a>
-                {% else %}
-                <p>Imagen no disponible</p>
-                {% endif %}
-                <h3>{{ producto.nombre }}</h3>
-                <div class="variants">
-                    {% for variante in producto.variantes %}
-                    <div class="variant" data-price="{{ variante.precio }}">
-                        <p>Variante: {{ variante.nombre }}</p> <!-- habrá que eliminarlo luego, tras pruebas-->
-                        <p>Precio: €{{ variante.precio }}</p>
-                        
-                        <!-- Mostrar peso solo si está presente -->
-                        {% if variante.peso %}
-                        <p>Peso: {{ variante.peso }} g</p>
-                        {% endif %}
-                        
-                        {% if variante.talla %}
-                        <p>Talla: {{ variante.talla }}</p>
-                        {% endif %}
-                        
-                        <!-- Formulario de adición al carrito -->
-                        <form method="post" action="{% url 'carrito:carrito_añadir' producto_id=variante.id %}">
-                            {% csrf_token %}
-                            <input type="hidden" name="cantidad" value="1">
-                            <input type="hidden" name="variante_id" value="{{ variante.id }}">
-                            <input type="hidden" name="sobreescribir" value="false">
-                            <button type="submit" class="btn btn-success {% if variante.stock <= 0 %}btn-disabled{% endif %}" {% if variante.stock <= 0 %}disabled{% endif %}>
-                                {% if variante.stock > 0 %}Añadir al carrito{% else %}No hay stock{% endif %}
-                            </button>
-                        </form>
+        {% if productos %}  <!-- Solo renderiza si hay productos en la categoría -->
+        <div id="{{ categoria|slugify }}" class="category-section">
+            <h2 class="text-success text-center my-4 py-2 border-bottom">{{ categoria|title }}</h2>            
+            <div class="product-grid">
+                {% for producto in productos %}
+                <div class="product-card {% if forloop.counter > 9 %}d-none{% endif %}" data-pagina="1">
+                    {% if producto.imagen1 %}
+                    <a href="{% url 'tienda:detalle_producto' producto.slug %}">
+                        <img src="{{ producto.imagen1 }}" alt="{{ producto.nombre }}">
+                    </a>
+                    {% else %}
+                    <p>Imagen no disponible</p>
+                    {% endif %}
+                    <h3>{{ producto.nombre }}</h3>
+                    <div class="variants">
+                        {% for variante in producto.variantes %}
+                        <div class="variant" data-price="{{ variante.precio }}">
+                            <p>Variante: {{ variante.nombre }}</p> <!-- habrá que eliminarlo luego, tras pruebas-->
+                            <p>Precio: €{{ variante.precio }}</p>
+                            {% if variante.peso %}
+                            <p>Peso: {{ variante.peso }} g</p>
+                            {% endif %}
+                            {% if variante.talla %}
+                            <p>Talla: {{ variante.talla }}</p>
+                            {% endif %}
+                            <form method="post" action="{% url 'carrito:carrito_añadir' producto_id=variante.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="cantidad" value="1">
+                                <input type="hidden" name="variante_id" value="{{ variante.id }}">
+                                <input type="hidden" name="sobreescribir" value="false">
+                                <button type="submit" class="btn btn-success {% if variante.stock <= 0 %}btn-disabled{% endif %}" {% if variante.stock <= 0 %}disabled{% endif %}>
+                                    {% if variante.stock > 0 %}Añadir al carrito{% else %}No hay stock{% endif %}
+                                </button>
+                            </form>
+                        </div>
+                        {% endfor %}
                     </div>
-                    {% endfor %}
                 </div>
+                {% endfor %}
             </div>
-            {% endfor %}
+            {% if productos|length > 9 %}
+            <div class="text-center my-4">
+                <button class="btn btn-success ver-mas-btn" data-categoria="{{ categoria|slugify }}" data-pagina="1">Ver más</button>
+            </div>
+            {% endif %}
         </div>
-        {% else %}
-        <p>Sin productos en esta categoría</p>
         {% endif %}
-    </div>
     {% endfor %}
 </section>
 
 <!-- Exponer los datos como JSON para manipular con JS -->
-<!-- <script>
+<script>
+    // Exponer los productos como JSON en una variable global
+    window.productosPorCategoria = {{ productos_por_categoria_json|safe }};
+    console.log('Productos por categoría expuestos:', window.productosPorCategoria);  // Verifica en la consola del navegador
+</script>
+<script src="{% static 'js/paginacion.js' %}"></script>
+<script>
+    // Exponer los productos como JSON
     const productosPorCategoria = {{ productos_por_categoria_json|safe }};
-</script> -->
-
+    console.log('Productos por categoría:', productosPorCategoria);  // Verifica en la consola del navegador
+</script>
 {% endblock %}
 
 

@@ -37,8 +37,8 @@ class Categoria(ImageOptimizableModel):
     """
     Categorías para los productos, como 'Flores', 'Resina', 'Ropa', etc.
     """
-    nombre = models.CharField(max_length=100, unique=True)
-    slug = models.SlugField(unique=True, blank=True)
+    nombre = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=300, blank=True)
     imagen = models.ImageField(
         upload_to="categorias/",
         null=True,
@@ -56,7 +56,7 @@ class Categoria(ImageOptimizableModel):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.nombre)
+            self.slug = slugify(self.nombre)[:250]
         super().save(*args, **kwargs)
         self.optimize_image(self.imagen)
 
@@ -67,7 +67,7 @@ class Producto(ImageOptimizableModel):
     Productos principales, como 'Flores Lemon Haze', 'Camiseta de Cáñamo', etc.
     """
     nombre = models.CharField(max_length=200)
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField(max_length=300, unique=True, blank=True)
 
     categoria = models.ForeignKey(
         Categoria,
@@ -103,7 +103,7 @@ class Producto(ImageOptimizableModel):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.nombre)
+            self.slug = slugify(self.nombre)[:250]
         super().save(*args, **kwargs)
         self.optimize_image(self.imagen1)
         self.optimize_image(self.imagen2)
@@ -121,10 +121,10 @@ class ProductoVariante(ImageOptimizableModel):
         help_text="Producto principal al que pertenece esta variante."
     )
     sku = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
-    nombre = models.CharField(max_length=100, help_text="Nombre de la variante, e.g., 'Lemon Haze 5g'.")
+    nombre = models.CharField(max_length=200, help_text="Nombre de la variante, e.g., 'Lemon Haze 5g'.")
     precio = models.DecimalField(max_digits=10, decimal_places=2, help_text="Precio de esta variante.")
     stock = models.PositiveIntegerField(default=0, help_text="Cantidad en stock.")
-    slug = models.SlugField(unique=True, blank=True, null=True)
+    slug = models.SlugField(max_length=500, unique=True, blank=True, null=True)
     peso = models.DecimalField(
         max_digits=8,
         decimal_places=2,
@@ -169,7 +169,7 @@ class ProductoVariante(ImageOptimizableModel):
     
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(f"{self.producto.nombre}-{self.nombre}")
+            self.slug = slugify(f"{self.producto.nombre}-{self.nombre}")[:250]
         super().save(*args, **kwargs)
         self.optimize_image(self.imagen1)
         self.optimize_image(self.imagen2)
