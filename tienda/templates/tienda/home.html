@@ -109,6 +109,7 @@ Tienda de productos de CBD, página principal
             {% if productos|length > 9 %}
             <div class="text-center my-4">
                 <button class="btn btn-success ver-mas-btn" data-categoria="{{ categoria|slugify }}" data-pagina="1">Ver más</button>
+                <button class="btn btn-outline-success ver-menos-btn d-none" data-categoria="{{ categoria|slugify }}" data-pagina="1">Ver menos</button>
             </div>
             {% endif %}
         </div>
@@ -117,11 +118,7 @@ Tienda de productos de CBD, página principal
 </section>
 
 <!-- Exponer los datos como JSON para manipular con JS -->
-<script>
-    // Exponer los productos como JSON en una variable global
-    window.productosPorCategoria = {{ productos_por_categoria_json|safe }};
-    console.log('Productos por categoría expuestos:', window.productosPorCategoria);  // Verifica en la consola del navegador
-</script>
+
 <script src="{% static 'js/paginacion.js' %}"></script>
 <script>
     // Exponer los productos como JSON

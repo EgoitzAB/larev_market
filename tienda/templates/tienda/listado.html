@@ -13,10 +13,15 @@
     <div class="category-buttons mb-5">
         <h3 class="text-success mb-3">Categorías</h3>
         <div class="d-flex flex-wrap gap-2">
-            {% for categoria in categorias %}
-                <a href="?categoria={{ categoria.nombre }}" class="btn btn-outline-success category-btn">
-                    {{ categoria.nombre }}
-                </a>
+            <button class="btn btn-outline-success category-btn" data-category="all">
+                Todo
+            </button>
+            {% for categoria, productos in productos_por_categoria_json.items %}
+                {% if productos %}  <!-- Solo renderiza si hay productos en la categoría -->
+                <button class="btn btn-outline-success category-btn" data-category="{{ categoria|slugify }}">
+                    {{ categoria|title }}
+                </button>
+                {% endif %}
             {% endfor %}
         </div>
     </div>
@@ -24,32 +29,43 @@
     <!-- Productos -->
     <div class="productos">
         <h2 class="text-success mb-4">Productos</h2>
-        <div class="product-grid">
-            {% for producto in productos|slice:":9" %}
-            <div class="product-card">
-                <a href="{% url 'tienda:detalle_producto' producto.slug %}">
-                    {% if producto.imagen1 %}
-                    <img src="{{ producto.imagen1.url }}" alt="{{ producto.nombre }}" class="product-image">
-                    {% else %}
-                    <img src="{% static 'images/no-image-available.png' %}" alt="Imagen no disponible" class="product-image">
-                    {% endif %}
-                    <h3 class="text-success mt-3">{{ producto.nombre }}</h3>
-                </a>
+        {% for categoria, productos in productos_por_categoria_json.items %}
+            {% if productos %}  <!-- Solo renderiza si hay productos en la categoría -->
+            <div id="{{ categoria|slugify }}" class="category-section">
+                <h3 class="text-success text-center my-4 py-2 border-bottom">{{ categoria|title }}</h3>
+                <div class="product-grid">
+                    {% for producto in productos %}
+                    <div class="product-card {% if forloop.counter > 9 %}d-none{% endif %}" data-pagina="1">
+                        <a href="{% url 'tienda:detalle_producto' producto.slug %}">
+                            {% if producto.imagen1 %}
+                            <img src="{{ producto.imagen1 }}" alt="{{ producto.nombre }}" class="product-image">
+                            {% else %}
+                            <img src="{% static 'images/no-image-available.png' %}" alt="Imagen no disponible" class="product-image">
+                            {% endif %}
+                            <h3 class="text-success mt-3">{{ producto.nombre }}</h3>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if productos|length > 9 %}
+                <div class="text-center my-4">
+                    <button class="btn btn-success ver-mas-btn" data-categoria="{{ categoria|slugify }}" data-pagina="1">Ver más</button>
+                    <button class="btn btn-outline-success ver-menos-btn d-none" data-categoria="{{ categoria|slugify }}" data-pagina="1">Ver menos</button>
+                </div>
+                {% endif %}
             </div>
-            {% endfor %}
-        </div>
-        {% if productos|length > 9 %}
-        <div class="text-center my-4">
-            <button class="btn btn-success ver-mas-btn" data-pagina="1">Ver más</button>
-        </div>
-        {% endif %}
+            {% endif %}
+        {% endfor %}
     </div>
 </div>
-<script src="{% static 'js/paginacion.js' %}"></script>
-<!-- En tu template HTML -->
+
+<!-- Exponer los datos como JSON para manipular con JS -->
 <script>
-    // Exponer los productos como JSON
-    const productosPorCategoria = {{ productos_por_categoria_json|safe }};
-    console.log('Productos por categoría:', productosPorCategoria);  // Verifica en la consola del navegador
+    // Exponer los productos como JSON en una variable global
+    window.productosPorCategoria = {{ productos_por_categoria_json|safe }};
+    console.log('Productos por categoría:', window.productosPorCategoria);  // Verifica en la consola del navegador
 </script>
+
+<!-- Cargar el archivo JavaScript para la paginación -->
+<script src="{% static 'js/paginacion.js' %}"></script>
 {% endblock %}
