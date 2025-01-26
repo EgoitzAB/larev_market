@@ -4,7 +4,9 @@ from .mfa_backends import EmailMFADevice
 from django.utils.timezone import now, timedelta
 from django.views import generic
 from allauth.account.models import EmailAddress
-from .models import InfoTienda
+from .models import InfoTienda, Favorito
+from pagos.models import Orden
+from django.contrib import messages
 import json
 
 
@@ -80,4 +82,38 @@ class PrivacidadView(generic.TemplateView):
 
 @login_required
 def perfil(request):
-    return render(request, 'core/perfil.html')
+    # Obtener los favoritos del usuario
+    favoritos = Favorito.objects.filter(usuario=request.user)
+    # Obtener las órdenes no finalizadas (estado diferente a 'completada')
+    ordenes_no_finalizadas = Orden.objects.filter(cliente=request.user).exclude(estado='completada')
+    # Obtener el historial de compras (órdenes completadas)
+    historial_compras = Orden.objects.filter(cliente=request.user, estado='completada')
+    context = {
+        'favoritos': favoritos,
+        'ordenes_no_finalizadas': ordenes_no_finalizadas,
+        'historial_compras': historial_compras,
+    }
+    return render(request, 'core/perfil.html', context)
+
+
+@login_required
+def eliminar_favorito(request, favorito_id):
+    favorito = get_object_or_404(Favorito, id=favorito_id, usuario=request.user)
+    favorito.delete()
+    messages.success(request, 'Producto eliminado de favoritos.')
+    return redirect('perfil')
+
+@login_required
+def detalle_orden(request, orden_id):
+    orden = get_object_or_404(Orden, id=orden_id, cliente=request.user)
+
+    # Lógica para continuar la compra
+    if request.method == 'POST' and 'continuar_compra' in request.POST:
+        if orden.estado in ['pendiente', 'procesando']:
+            # Redirigir al proceso de pago
+            return redirect('pagos:realizar_compra', orden_id=orden.id)
+        else:
+            # Mostrar un mensaje de error si la orden no puede continuarse
+            messages.error(request, 'No se puede continuar con esta orden.')
+
+    return render(request, 'core/detalle_orden.html', {'orden': orden})

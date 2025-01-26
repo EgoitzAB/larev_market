@@ -1,4 +1,7 @@
 from django.db import models
+from django.conf import settings
+from tienda.models import Producto
+
 
 class InfoTienda(models.Model):
     nombre_tienda = models.CharField(max_length=255, default="La Revolución Verde CBD")
@@ -21,3 +24,12 @@ class InfoTienda(models.Model):
 
     def __str__(self):
         return self.nombre_tienda
+
+
+class Favorito(models.Model):
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    fecha_agregado = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('usuario', 'producto')

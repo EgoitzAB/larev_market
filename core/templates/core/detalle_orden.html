@@ -1,0 +1,44 @@
+{% extends 'page/base.html' %}
+{% load static %}
+
+{% block title %}
+Detalle de la Orden #{{ orden.id }}
+{% endblock title %}
+
+{% block navbar %}
+{% include 'page/navbar.html' %}
+{% endblock navbar %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="profile-header">
+        <h2>Detalle de la Orden #{{ orden.id }}</h2>
+        <p><strong>Fecha:</strong> {{ orden.fecha_creacion }}</p>
+        <p><strong>Total:</strong> {{ orden.total }}</p>
+        <p><strong>Estado:</strong> {{ orden.estado }}</p>
+    </div>
+
+    <div class="profile-tabs">
+        <h3>Productos</h3>
+        <ul class="ordenes-list">
+            {% for item in orden.items.all %}
+            <li>
+                {{ item.producto.nombre }} - Cantidad: {{ item.cantidad }} - Precio Unitario: {{ item.precio_unitario }}
+            </li>
+            {% empty %}
+            <p class="no-items">No hay productos en esta orden.</p>
+            {% endfor %}
+        </ul>
+
+        <!-- Botón para continuar la compra -->
+        {% if orden.estado in 'pendiente' 'procesando' %}
+        <form method="post" action="{% url 'core:detalle_orden' orden.id %}">
+            {% csrf_token %}
+            <button type="submit" name="continuar_compra" class="btn btn-success">Continuar la Compra</button>
+        </form>
+        {% endif %}
+
+        <a href="{% url 'core:perfil' %}" class="btn btn-primary">Volver al Perfil</a>
+    </div>
+</div>
+{% endblock content %}
