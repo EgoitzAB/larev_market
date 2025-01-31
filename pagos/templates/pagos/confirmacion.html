@@ -1,0 +1,26 @@
+<!-- templates/pago/confirmacion.html -->
+{% extends "page/base.html" %}
+{% block title %}Confirmación de Compra{% endblock %}
+
+{% block navbar %}
+  {% include 'page/navbar.html' %}
+{% endblock navbar %}
+
+{% block content %}
+  <div class="confirmation-container">
+    <div class="confirmation-box">
+      <h1 class="confirmation-title">¡Gracias por tu compra!</h1>
+      <p class="confirmation-message">Tu compra se ha realizado con éxito. Los detalles de tu orden son los siguientes:</p>
+
+      <h2 class="order-details-title">Detalles de la Orden</h2>
+      <p><strong>ID de Orden:</strong> {{ compra.id }}</p>
+      <p><strong>Nombre del Comprador:</strong> {{ compra.nombre }} {{ compra.apellido }}</p>
+      <p><strong>Correo Electrónico:</strong> {{ compra.email }}</p>
+      <p><strong>Total:</strong> {{ compra.total }} EUR</p>
+
+      <p>Recibirás un correo con más detalles de tu compra.</p>
+
+      <a href="{% url 'tienda:home' %}" class="confirmation-button">Volver al inicio</a>
+    </div>
+  </div>
+{% endblock %}

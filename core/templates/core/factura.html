@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factura #{{ orden.id }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+        }
+        h1, h2, h3 {
+            text-align: center;
+        }
+        .empresa-info, .cliente-info {
+            margin-bottom: 20px;
+        }
+        .empresa-info p, .cliente-info p {
+            margin: 2px 0;
+        }
+        .factura-detalle {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .factura-detalle th, .factura-detalle td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .factura-detalle th {
+            background-color: #f4f4f4;
+        }
+        .total {
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Información de la empresa -->
+        <div class="empresa-info">
+            <h1>Mi Tienda Online</h1>
+            <p>Dirección: Calle 123, Ciudad, País</p>
+            <p>Teléfono: +123 456 789</p>
+            <p>Email: contacto@mitienda.com</p>
+        </div>
+
+        <hr>
+
+        <!-- Información del cliente -->
+        <div class="cliente-info">
+            <h2>Factura para:</h2>
+            <p><strong>Nombre:</strong> {{ orden.cliente.first_name }} {{ orden.cliente.last_name }}</p>
+            <p><strong>Email:</strong> {{ orden.cliente.email }}</p>
+            <p><strong>Dirección de envío:</strong> {{ orden.direccion_envio }}</p>
+            <p><strong>Fecha de compra:</strong> {{ orden.fecha_creacion|date:"d/m/Y" }}</p>
+        </div>
+
+        <hr>
+
+        <!-- Detalles de la orden -->
+        <h2>Detalles de la Factura</h2>
+        <table class="factura-detalle">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unitario</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in orden.items.all %}
+                <tr>
+                    <td>{{ item.producto.nombre }}</td>
+                    <td>{{ item.cantidad }}</td>
+                    <td>${{ item.precio_unitario }}</td>
+                    <td>${{ item.cantidad|floatformat:2|add:item.precio_unitario }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Total -->
+        <p class="total">Total: <strong>${{ orden.total }}</strong></p>
+
+        <!-- Mensaje final -->
+        <div class="footer">
+            <p>Gracias por su compra. Si tiene alguna pregunta, contáctenos en nuestro correo de atención al cliente.</p>
+        </div>
+    </div>
+
+</body>
+</html>

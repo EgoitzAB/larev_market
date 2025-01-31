@@ -26,7 +26,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-7y14cf!h6-9l3ulf8mv=dq@6i=llj%$3+tud_ij(@)0gl-kbb%')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG') == 'True'
+# DEBUG = os.getenv('DEBUG') == 'True'
+DEBUG = 'True'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
@@ -58,6 +59,10 @@ INSTALLED_APPS = [
     'checkout',
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://d842-2a0c-5a85-c805-dd00-d6d2-c1ac-b9e6-6a31.ngrok-free.app',  # Tu dominio de ngrok
+    'https://localhost',
+]
 MIDDLEWARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -115,7 +120,15 @@ DATABASES = {
 
 REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
 REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
-REDIS_DB = int(os.getenv('REDIS_DB', 0))  
+REDIS_DB = int(os.getenv('REDIS_DB', 0))
+
+# Configuración de Celery
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "amqp://guest:guest@rabbitmq:5672//")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://redis-server:6379/0")
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = "UTC"
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -192,7 +205,7 @@ LOGIN_URL = '/accounts/login/'
 PAYGREEN_SHOP_ID = os.getenv('PAYGREEN_SHOP_ID', 'default-public-key')
 PAYGREEN_SECRET_KEY = os.getenv('PAYGREEN_SECRET_KEY', 'default-private-key')
 PAYGREEN_API_URL = os.getenv('PAYGREEN_API_URL', 'https://default-paygreen-url.com')
-SITE_URL = os.getenv("SITE_URL", "http://127.0.0.1:8000")
+SITE_URL = os.getenv("SITE_URL", "http://localhost:8000")
 GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 
 LOGGING = {

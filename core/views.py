@@ -7,6 +7,8 @@ from allauth.account.models import EmailAddress
 from .models import InfoTienda, Favorito
 from pagos.models import Orden
 from django.contrib import messages
+from django.http import JsonResponse
+from core.tasks import generar_enviar_factura
 import json
 
 
@@ -117,3 +119,8 @@ def detalle_orden(request, orden_id):
             messages.error(request, 'No se puede continuar con esta orden.')
 
     return render(request, 'core/detalle_orden.html', {'orden': orden})
+
+def enviar_factura(request, orden_id):
+    orden = get_object_or_404(Orden, id=orden_id, pago__estado='exitoso')
+    generar_enviar_factura.delay(orden.id)  # Llamada asíncrona con Celery
+    return JsonResponse({'mensaje': 'Factura en proceso de envío.'})

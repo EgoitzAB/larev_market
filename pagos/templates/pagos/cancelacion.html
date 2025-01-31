@@ -1,6 +1,6 @@
-<!-- templates/pago/error.html -->
+<!-- templates/pago/cancelacion.html -->
 {% extends "page/base.html" %}
-{% block title %}Error en el Pago{% endblock %}
+{% block title %}Compra Cancelada{% endblock %}
 
 {% block navbar %}
   {% include 'page/navbar.html' %}
@@ -9,8 +9,8 @@
 {% block content %}
   <div class="confirmation-container">
     <div class="confirmation-box">
-      <h1 class="confirmation-title">Error en el Pago</h1>
-      <p class="confirmation-message">Hubo un problema al procesar tu compra: {{ error_message }}</p>
+      <h1 class="confirmation-title">Compra Cancelada</h1>
+      <p class="confirmation-message">La compra ha sido cancelada. Si tienes algún problema, no dudes en contactarnos.</p>
       <a href="{% url 'carrito:carrito_detalle' %}" class="confirmation-button">Volver al carrito</a>
     </div>
   </div>

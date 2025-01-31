@@ -8,6 +8,11 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
+    libpango1.0-0 \
+    libcairo2 \
+    libgdk-pixbuf2.0-0 \
+    libffi-dev \
+    libglib2.0-dev \
     --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
 # Copiar los archivos de requerimientos

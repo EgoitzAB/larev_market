@@ -58,7 +58,7 @@ def checkout(request):
         except Exception as e:
             # Manejar errores durante la creación de la orden
             messages.error(request, f"Error al crear la orden: {str(e)}")
-            return redirect('checkout')
+            return redirect('checkout:crear_orden')
 
     else:
         # Mostrar el formulario de dirección

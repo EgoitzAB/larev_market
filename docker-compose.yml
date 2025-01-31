@@ -6,6 +6,8 @@ services:
     container_name: django_web_dev
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     environment:
       - DEBUG=True
       - DB_ENGINE=django.db.backends.postgresql
@@ -44,6 +46,33 @@ services:
       - "6379:6379"
     volumes:
       - redis-data:/data
+  
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    ports:
+      - "5672:5672"
+      - "15672:15672"  # Interfaz web de RabbitMQ
+
+  celery_worker:
+    build: .
+    command: sh -c "./wait-for-it.sh rabbitmq:5672 -- celery -A larev worker --loglevel=info"
+    environment:
+      - DEBUG=True
+      - DB_ENGINE=django.db.backends.postgresql
+      - DB_NAME=${POSTGRES_DB}
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_HOST=db
+      - DB_PORT=5432
+      - REDIS_HOST=redis-server
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
+      - CELERY_RESULT_BACKEND=redis://redis-server:6379/0
+    depends_on:
+      - web
+      - rabbitmq
+      - redis-server
 
 volumes:
   postgres_data:

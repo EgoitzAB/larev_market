@@ -1,0 +1,33 @@
+{% extends 'page/base.html' %}
+
+{% block content %}
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-header">
+            <h2>Estado de tu compra</h2>
+          </div>
+          <div class="card-body">
+            <h3>Tu pago ha sido autorizado pero aún está pendiente de captura.</h3>
+            <p>Gracias por tu compra. El pago se encuentra en proceso y estamos esperando la confirmación de PayGreen.</p>
+            
+            <h4>Detalles de la orden:</h4>
+            <ul>
+              <li><strong>Orden ID:</strong> {{ compra.id }}</li>
+              <li><strong>Total a pagar:</strong> {{ compra.total }} EUR</li>
+              <li><strong>Cliente:</strong> {{ compra.cliente.username }}</li>
+              <li><strong>Dirección de envío:</strong> {{ compra.direccion_envio.direccion }}</li>
+            </ul>
+
+            <p>Si tienes alguna pregunta o preocupación, no dudes en contactar con nuestro equipo de soporte.</p>
+
+            <p>Te notificaremos cuando el pago haya sido completado.</p>
+
+            <a href="{% url 'compra:carrito' %}" class="btn btn-primary">Volver al carrito</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -87,6 +87,7 @@ Perfil de {{ request.user.username }}
                     <li>
                         Orden #{{ orden.id }} - {{ orden.fecha_creacion }} - Total: {{ orden.total }}
                         <a href="{% url 'detalle_orden' orden.id %}" class="btn btn-info btn-sm">Ver Detalles</a>
+                        <a href="{% url 'core:enviar_factura' orden.id %}" class="btn btn-primary btn-sm">Generar Factura</a>
                     </li>
                     {% empty %}
                     <p class="no-items">No tienes compras realizadas.</p>

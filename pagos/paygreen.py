@@ -87,7 +87,9 @@ def crear_orden_pago(jwt, orden, buyer_id):
         "content-type": "application/json",
         "authorization": f"Bearer {jwt}",
     }
+
     logging.info(f"Encabezados de la solicitud: {headers}")
+    
     try:
         response = requests.post(paygreen_url, json=payload, headers=headers)
         data = response.json()
