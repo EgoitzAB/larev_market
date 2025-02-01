@@ -6,6 +6,16 @@
 {% endblock navbar %}
 
 {% block content %}
+{% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
 <div class="checkout-container">
     <h1>Checkout</h1>
 
@@ -17,7 +27,7 @@
         {% if direcciones.exists %}
             <ul class="list-unstyled">
                 {% for direccion in direcciones %}
-                    <li class="mb-3 p-3 bg-light rounded">
+                    <li class="mb-3 p-3 bg-light rounded" id="direccion-{{ direccion.id }}">
                         <label class="d-flex align-items-center">
                             <input type="radio" name="direccion_id" value="{{ direccion.id }}" class="me-3">
                             <div>
@@ -25,6 +35,8 @@
                                 {{ direccion.direccion }}, {{ direccion.ciudad }} - {{ direccion.codigo_postal }}, {{ direccion.pais }}
                             </div>
                         </label>
+                        <!-- Botón para eliminar la dirección -->
+                        <button type="button" class="btn btn-danger btn-sm eliminar-btn" data-id="{{ direccion.id }}">Eliminar</button>
                     </li>
                 {% endfor %}
             </ul>
@@ -79,3 +91,7 @@
 </div>
 
 {% endblock content %}
+
+{% block javascript %}
+<script src="{% static 'js/checkout.js' %}"></script>
+{% endblock javascript %}
