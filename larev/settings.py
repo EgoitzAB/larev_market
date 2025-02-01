@@ -44,7 +44,7 @@ INSTALLED_APPS = [
 
     'django.contrib.postgres',
     'debug_toolbar',
-
+    'whitenoise.runserver_nostatic',
     'defender',
 
     'allauth',
@@ -130,6 +130,7 @@ REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
 REDIS_DB = int(os.getenv('REDIS_DB', 0))
 DEFENDER_REDIS_URL = "redis://redis-server:6379/1"
 
+
 # Configuración de Celery
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "amqp://guest:guest@rabbitmq:5672//")
 CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://redis-server:6379/0")
@@ -182,6 +183,8 @@ SITE_ID = 1
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']  # Carpeta(s) donde se encuentran tus archivos estáticos
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
