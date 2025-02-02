@@ -4,7 +4,7 @@ FROM python:3.11-slim
 # Establecer el directorio de trabajo
 WORKDIR /app
 
-# Instalar dependencias del sistema (libpq-dev es útil si usas PostgreSQL)
+# Instalar dependencias del sistema y mod_wsgi
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
@@ -13,6 +13,9 @@ RUN apt-get update && apt-get install -y \
     libgdk-pixbuf2.0-0 \
     libffi-dev \
     libglib2.0-dev \
+    apache2 \
+    apache2-dev \
+    libapache2-mod-wsgi-py3 \
     --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
 # Copiar los archivos de requerimientos
@@ -27,14 +30,18 @@ COPY . .
 # Crear carpeta para archivos estáticos
 RUN mkdir -p /app/staticfiles
 
-# Colectar archivos estáticos (solo si es necesario en desarrollo, si no lo necesitas puedes omitirlo)
+# Colectar archivos estáticos
 RUN python manage.py collectstatic --noinput
 
 # Variables de entorno para Django
 ENV PYTHONUNBUFFERED=1
-ENV DJANGO_SETTINGS_MODULE=larev.settings 
-# Exponer el puerto del contenedor
-EXPOSE 8000
+ENV DJANGO_SETTINGS_MODULE=larev.settings
 
-# Especificar el comando para ejecutar Django en modo desarrollo
-CMD ["sh", "-c", "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
+# Configurar Apache
+COPY ./apache/django.conf /etc/apache2/sites-available/000-default.conf
+
+# Exponer el puerto del contenedor
+EXPOSE 80
+
+# Especificar el comando para ejecutar Apache en modo producción
+CMD ["apache2ctl", "-D", "FOREGROUND"]
