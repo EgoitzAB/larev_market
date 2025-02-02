@@ -5,68 +5,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Factura #{{ orden.id }}</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 0;
-            color: #333;
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #333;
+            --light-bg: #f9f9f9;
+            --border-color: #ddd;
+            --text-color: #444;
+            --font-family: 'Arial', sans-serif;
         }
+
+        body {
+            font-family: var(--font-family);
+            margin: 0;
+            padding: 20px;
+            color: var(--text-color);
+            background-color: var(--light-bg);
+        }
+
         .container {
             max-width: 800px;
-            margin: 0 auto;
+            margin: auto;
             padding: 20px;
-            border: 1px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+
         h1, h2, h3 {
             text-align: center;
+            color: var(--primary-color);
         }
+
         .empresa-info, .cliente-info {
             margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: var(--light-bg);
         }
-        .empresa-info p, .cliente-info p {
-            margin: 2px 0;
-        }
+
         .factura-detalle {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
+
         .factura-detalle th, .factura-detalle td {
-            border: 1px solid #ddd;
+            border: 1px solid var(--border-color);
             padding: 10px;
             text-align: left;
         }
+
         .factura-detalle th {
-            background-color: #f4f4f4;
+            background-color: var(--primary-color);
+            color: white;
         }
+
         .total {
             text-align: right;
             font-size: 18px;
             font-weight: bold;
-            margin-top: 10px;
+            margin-top: 20px;
         }
+
         .footer {
             text-align: center;
             margin-top: 20px;
             font-size: 12px;
-            color: #666;
+            color: var(--secondary-color);
         }
     </style>
 </head>
 <body>
-
     <div class="container">
-        <!-- Información de la empresa -->
         <div class="empresa-info">
-            <h1>Mi Tienda Online</h1>
-            <p>Dirección: Calle 123, Ciudad, País</p>
-            <p>Teléfono: +123 456 789</p>
-            <p>Email: contacto@mitienda.com</p>
+            <h1>La Revolución Verde CBD</h1>
+            <p>Dirección: Calle San Francisco 54, Donostia-San Sebastián</p>
+            <p>Teléfono: +34 123 456 789</p>
+            <p>Email: contacto@revolucionverde.com</p>
         </div>
-
+        
         <hr>
 
-        <!-- Información del cliente -->
         <div class="cliente-info">
             <h2>Factura para:</h2>
             <p><strong>Nombre:</strong> {{ orden.cliente.first_name }} {{ orden.cliente.last_name }}</p>
@@ -74,10 +93,9 @@
             <p><strong>Dirección de envío:</strong> {{ orden.direccion_envio }}</p>
             <p><strong>Fecha de compra:</strong> {{ orden.fecha_creacion|date:"d/m/Y" }}</p>
         </div>
-
+        
         <hr>
 
-        <!-- Detalles de la orden -->
         <h2>Detalles de la Factura</h2>
         <table class="factura-detalle">
             <thead>
@@ -93,21 +111,18 @@
                 <tr>
                     <td>{{ item.producto.nombre }}</td>
                     <td>{{ item.cantidad }}</td>
-                    <td>${{ item.precio_unitario }}</td>
-                    <td>${{ item.cantidad|floatformat:2|add:item.precio_unitario }}</td>
+                    <td>{{ item.precio_unitario|floatformat:2 }} €</td>
+                    <td>{{ item.cantidad|floatformat:2|add:item.precio_unitario }} €</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
 
-        <!-- Total -->
-        <p class="total">Total: <strong>${{ orden.total }}</strong></p>
-
-        <!-- Mensaje final -->
+        <p class="total">Total: <strong>{{ orden.total }} €</strong></p>
+        
         <div class="footer">
-            <p>Gracias por su compra. Si tiene alguna pregunta, contáctenos en nuestro correo de atención al cliente.</p>
+            <p>Gracias por su compra. Si tiene alguna consulta, contáctenos.</p>
         </div>
     </div>
-
 </body>
 </html>

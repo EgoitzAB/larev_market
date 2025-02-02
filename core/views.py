@@ -9,8 +9,13 @@ from .models import InfoTienda, Favorito
 from tienda.models import ProductoVariante
 from pagos.models import Orden
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
+from django.template.loader import render_to_string
 from core.tasks import generar_enviar_factura
+
+from weasyprint import HTML
+from io import BytesIO
+
 import json
 
 
@@ -164,3 +169,25 @@ def enviar_factura(request, orden_id):
     orden = get_object_or_404(Orden, id=orden_id, pago__estado='exitoso')
     generar_enviar_factura.delay(orden.id)  # Llamada asíncrona con Celery
     return JsonResponse({'mensaje': 'Factura en proceso de envío.'})
+
+@login_required
+def descargar_factura(request, orden_id):
+    orden = get_object_or_404(Orden, id=orden_id, cliente=request.user)
+
+    # Verificar que la orden está completada y el pago es exitoso
+    if orden.estado != 'completada' or orden.pago.estado != 'exitoso':
+        return HttpResponse("No puedes descargar la factura de una orden no completada.", status=400)
+
+    # Renderizar la factura en HTML
+    contexto = {'orden': orden}
+    html_string = render_to_string('core/factura.html', contexto)
+
+    # Generar PDF
+    pdf_buffer = BytesIO()
+    HTML(string=html_string).write_pdf(pdf_buffer)
+    pdf_buffer.seek(0)
+
+    # Crear respuesta para la descarga
+    response = HttpResponse(pdf_buffer.read(), content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="factura_{orden.id}.pdf"'
+    return response
