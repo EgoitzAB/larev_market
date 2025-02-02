@@ -100,6 +100,10 @@ Tienda de productos de CBD, página principal
                                     {% if variante.stock > 0 %}Añadir al carrito{% else %}No hay stock{% endif %}
                                 </button>
                             </form>
+                                <!-- Botón de Favoritos con Font Awesome -->
+                                <button class="favorito-btn" data-variante-id="{{ variante.id }}">
+                                    <i class="{% if variante in favoritos %}fa-solid text-danger{% else %}fa-regular{% endif %} fa-heart"></i>
+                                </button>
                         </div>
                         {% endfor %}
                     </div>
@@ -120,11 +124,8 @@ Tienda de productos de CBD, página principal
 <!-- Exponer los datos como JSON para manipular con JS -->
 
 <script src="{% static 'js/paginacion.js' %}"></script>
-<script>
-    // Exponer los productos como JSON
-    const productosPorCategoria = {{ productos_por_categoria_json|safe }};
-    console.log('Productos por categoría:', productosPorCategoria);  // Verifica en la consola del navegador
-</script>
+<script src="{% static 'js/favoritos.js' %}"></script>
+
 {% endblock %}
 
 

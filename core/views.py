@@ -2,9 +2,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .mfa_backends import EmailMFADevice
 from django.utils.timezone import now, timedelta
+from django.urls import reverse
 from django.views import generic
 from allauth.account.models import EmailAddress
 from .models import InfoTienda, Favorito
+from tienda.models import ProductoVariante
 from pagos.models import Orden
 from django.contrib import messages
 from django.http import JsonResponse
@@ -97,13 +99,51 @@ def perfil(request):
     }
     return render(request, 'core/perfil.html', context)
 
+@login_required(login_url='account_login')
+def toggle_favorito(request):
+    """
+    Permite añadir o quitar un producto de favoritos con AJAX.
+    Solo funciona si el usuario está autenticado.
+    """
+    if request.method != "POST":
+        return JsonResponse({"error": "Método no permitido."}, status=405)
+
+    variante_id = request.POST.get("variante_id")
+    if not variante_id:
+        return JsonResponse({"error": "No se proporcionó una variante válida."}, status=400)
+
+    variante = get_object_or_404(ProductoVariante, id=variante_id)
+
+    favorito, created = Favorito.objects.get_or_create(usuario=request.user, producto_variante=variante)
+  
+    if not created:
+        favorito.delete()
+        messages.success(request, f"{variante.nombre} eliminado de tus favoritos.")
+        return JsonResponse({"added": False})
+    
+    messages.success(request, f"{variante.nombre} añadido a tus favoritos.")
+    return JsonResponse({"added": True})
 
 @login_required
-def eliminar_favorito(request, favorito_id):
-    favorito = get_object_or_404(Favorito, id=favorito_id, usuario=request.user)
-    favorito.delete()
-    messages.success(request, 'Producto eliminado de favoritos.')
-    return redirect('perfil')
+def guardar_favoritos(request):
+    """
+    Guarda los favoritos del usuario cuando se cierra sesión o el navegador.
+    """
+    if request.method == "POST":
+        data = json.loads(request.body)
+        favoritos = data.get("favoritos", [])
+
+        # Elimina los actuales favoritos del usuario
+        Favorito.objects.filter(usuario=request.user).delete()
+
+        # Guarda los nuevos favoritos
+        for variante_id in favoritos:
+            variante = get_object_or_404(ProductoVariante, id=variante_id)
+            Favorito.objects.get_or_create(usuario=request.user, producto_variante=variante)
+
+        return JsonResponse({"success": True})
+
+    return JsonResponse({"error": "Método no permitido."}, status=405)
 
 @login_required
 def detalle_orden(request, orden_id):

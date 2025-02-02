@@ -211,7 +211,7 @@ ACCOUNT_AUTHENTICATED_REDIRECT_URL = '/'
 # Redirección después del login
 LOGIN_REDIRECT_URL = '/'  # Cambiar según tu vista
 LOGOUT_REDIRECT_URL = '/'  # Cambiar según tu vista
-LOGIN_URL = '/accounts/login/'
+LOGIN_URL = 'account_login'
 
 PAYGREEN_SHOP_ID = os.getenv('PAYGREEN_SHOP_ID', 'default-public-key')
 PAYGREEN_SECRET_KEY = os.getenv('PAYGREEN_SECRET_KEY', 'default-private-key')

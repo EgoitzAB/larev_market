@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from tienda.models import Producto
+from tienda.models import ProductoVariante
 
 
 class InfoTienda(models.Model):
@@ -28,8 +28,8 @@ class InfoTienda(models.Model):
 
 class Favorito(models.Model):
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    producto_variante = models.ForeignKey(ProductoVariante, on_delete=models.CASCADE)
     fecha_agregado = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('usuario', 'producto')
+        unique_together = ('usuario', 'producto_variante')
