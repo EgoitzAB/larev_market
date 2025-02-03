@@ -1,16 +1,12 @@
 services:
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: django_web_dev
-    ports:
-      - "8000:8000"
-    env_file:
-      - .env
+    build: .
+    container_name: django_web
     environment:
-      - DEBUG=True
-      - DB_ENGINE=django.db.backends.postgresql
+      - DEBUG=False
+      - SECRET_KEY=${SECRET_KEY}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
+      - DB_ENGINE=${DB_ENGINE}
       - DB_NAME=${POSTGRES_DB}
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}
@@ -19,12 +15,18 @@ services:
       - REDIS_HOST=redis-server
       - REDIS_PORT=6379
       - REDIS_DB=0
+      - EMAIL_BACKEND=${EMAIL_BACKEND}
+      - EMAIL_HOST=${EMAIL_HOST}
+      - EMAIL_PORT=${EMAIL_PORT}
+      - EMAIL_USE_TLS=${EMAIL_USE_TLS}
+      - EMAIL_HOST_USER=${EMAIL_HOST_USER}
+      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}
     volumes:
       - .:/app
     depends_on:
       - db
       - redis-server
-    command: sh -c "./wait-for-it.sh db:5432 -- python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    command: sh -c "./wait-for-it.sh db:5432 -- ./wait-for-it.sh redis-server:6379 -- apache2ctl -D FOREGROUND"
   db:
     image: postgres:13
     container_name: postgres_db
@@ -57,8 +59,8 @@ services:
     build: .
     command: sh -c "./wait-for-it.sh rabbitmq:5672 -- celery -A larev worker --loglevel=info"
     environment:
-      - DEBUG=True
-      - DB_ENGINE=django.db.backends.postgresql
+      - DEBUG=False
+      - DB_ENGINE=${DB_ENGINE}
       - DB_NAME=${POSTGRES_DB}
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}
@@ -67,8 +69,6 @@ services:
       - REDIS_HOST=redis-server
       - REDIS_PORT=6379
       - REDIS_DB=0
-      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
-      - CELERY_RESULT_BACKEND=redis://redis-server:6379/0
     depends_on:
       - web
       - rabbitmq

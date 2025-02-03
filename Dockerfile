@@ -37,9 +37,6 @@ RUN python manage.py collectstatic --noinput
 ENV PYTHONUNBUFFERED=1
 ENV DJANGO_SETTINGS_MODULE=larev.settings
 
-# Configurar Apache
-COPY ./apache/django.conf /etc/apache2/sites-available/000-default.conf
-
 # Exponer el puerto del contenedor
 EXPOSE 80
 
