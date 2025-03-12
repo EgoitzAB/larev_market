@@ -18,7 +18,7 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -27,9 +27,9 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-7y14cf!h6-9l3ulf8mv=dq@6i=
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = os.getenv('DEBUG') == 'True'
-DEBUG = 'True'
+DEBUG = False
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'larevolucionverde.es').split(',')
 
 ALLOWED_HOSTS.append(os.getenv('SITE_URL'))
 # Application definition
@@ -44,8 +44,9 @@ INSTALLED_APPS = [
 
     'django.contrib.postgres',
     'debug_toolbar',
-    'whitenoise.runserver_nostatic',
+    'whitenoise',
     'defender',
+    'redisboard',
 
     'allauth',
     'allauth.account',
@@ -62,9 +63,11 @@ INSTALLED_APPS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://d842-2a0c-5a85-c805-dd00-d6d2-c1ac-b9e6-6a31.ngrok-free.app',  # Tu dominio de ngrok
+    'https://larevolucionverde.es',
+    'https://www.larevolucionverde.es',
     'https://localhost',
 ]
+
 MIDDLEWARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -116,19 +119,19 @@ WSGI_APPLICATION = 'larev.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.sqlite3'),
-        'NAME': os.getenv('DB_NAME', BASE_DIR / 'db.sqlite3'),
-        'USER': os.getenv('DB_USER', ''),
-        'PASSWORD': os.getenv('DB_PASSWORD', ''),
-        'HOST': os.getenv('DB_HOST', ''),
-        'PORT': os.getenv('DB_PORT', ''),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
     }
 }
 
 REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
 REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
 REDIS_DB = int(os.getenv('REDIS_DB', 0))
-DEFENDER_REDIS_URL = "redis://redis-server:6379/1"
+DEFENDER_REDIS_URL = "redis://localhost:6379/1"
 
 
 # Configuración de Celery
@@ -216,7 +219,7 @@ LOGIN_URL = 'account_login'
 PAYGREEN_SHOP_ID = os.getenv('PAYGREEN_SHOP_ID', 'default-public-key')
 PAYGREEN_SECRET_KEY = os.getenv('PAYGREEN_SECRET_KEY', 'default-private-key')
 PAYGREEN_API_URL = os.getenv('PAYGREEN_API_URL', 'https://default-paygreen-url.com')
-SITE_URL = os.getenv("SITE_URL", "http://localhost:8000")
+SITE_URL = os.getenv("SITE_URL")
 GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 
 LOGGING = {
@@ -235,3 +238,17 @@ LOGGING = {
         },
     },
 }
+
+SECURE_HSTS_SECONDS = 31536000  # 1 año
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+SECURE_SSL_REDIRECT = True
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_SSL_HOST = True
+SECURE_REFERRER_POLICY = 'same-origin'
