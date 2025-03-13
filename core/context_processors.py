@@ -1,7 +1,9 @@
 from tienda.models import Categoria
 
 def productos_por_categoria(request):
-    categorias = Categoria.objects.prefetch_related('productos__variantes')
+    categorias = Categoria.objects.prefetch_related('productos__variantes', 'subcategorias')
+    
+    # Estructura original (lista de productos por categoría)
     productos_por_categoria = {
         categoria.nombre: [
             {
@@ -29,4 +31,22 @@ def productos_por_categoria(request):
         ]
         for categoria in categorias
     }
-    return {'productos_por_categoria_json': productos_por_categoria}
+    
+    # Nuevo diccionario para subcategorías por categoría
+    subcategorias_por_categoria = {
+        categoria.nombre: [
+            {
+                'id': subcategoria.id,
+                'nombre': subcategoria.nombre,
+                'slug': subcategoria.slug,
+                'imagen': subcategoria.imagen.url if subcategoria.imagen else None,
+            }
+            for subcategoria in categoria.subcategorias.all()
+        ]
+        for categoria in categorias
+    }
+    
+    return {
+        'productos_por_categoria_json': productos_por_categoria,
+        'subcategorias_por_categoria_json': subcategorias_por_categoria,
+    }

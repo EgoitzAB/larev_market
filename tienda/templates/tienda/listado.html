@@ -9,53 +9,40 @@
 <div class="container my-5">
     <h1 class="text-success mb-4">Productos</h1>
 
-    <!-- Filtros de Categorías -->
-    <div class="category-buttons mb-5">
-        <h3 class="text-success mb-3">Categorías</h3>
-        <div class="d-flex flex-wrap gap-2">
-            <button class="btn btn-outline-success category-btn" data-category="all">
-                Todo
-            </button>
-            {% for categoria, productos in productos_por_categoria_json.items %}
-                {% if productos %}  <!-- Solo renderiza si hay productos en la categoría -->
-                <button class="btn btn-outline-success category-btn" data-category="{{ categoria|slugify }}">
-                    {{ categoria|title }}
-                </button>
-                {% endif %}
-            {% endfor %}
+    <!-- Filtros de Categorías y Subcategorías -->
+    <div class="row">
+        <!-- Subcategorías a la izquierda -->
+        <div class="col-md-3">
+            <h3 class="text-success mb-3">Subcategorías</h3>
+            <ul class="list-group">
+                {% for subcat in subcategorias %}
+                <li class="list-group-item">
+                    <a href="{% url 'tienda:listado_subcategoria' categoria.slug subcat.slug %}">
+                        {{ subcat.nombre }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
         </div>
-    </div>
 
-    <!-- Productos -->
-    <div class="productos">
-        <h2 class="text-success mb-4">Productos</h2>
-        {% for categoria, productos in productos_por_categoria_json.items %}
-            {% if productos %}  <!-- Solo renderiza si hay productos en la categoría -->
-            <div id="{{ categoria|slugify }}" class="category-section">
-                <h3 class="text-success text-center my-4 py-2 border-bottom">{{ categoria|title }}</h3>
-                <div class="product-grid">
-                    {% for producto in productos %}
-                    <div class="product-card {% if forloop.counter > 9 %}d-none{% endif %}" data-pagina="1">
-                        <a href="{% url 'tienda:detalle_producto' producto.slug %}">
-                            {% if producto.imagen1 %}
-                            <img src="{{ producto.imagen1 }}" alt="{{ producto.nombre }}" class="product-image">
-                            {% else %}
-                            <img src="{% static 'images/no-image-available.png' %}" alt="Imagen no disponible" class="product-image">
-                            {% endif %}
-                            <h3 class="text-success mt-3">{{ producto.nombre }}</h3>
-                        </a>
-                    </div>
-                    {% endfor %}
+        <!-- Productos a la derecha -->
+        <div class="col-md-9">
+            <h2 class="text-success mb-4">Productos</h2>
+            <div class="product-grid">
+                {% for producto in productos %}
+                <div class="product-card">
+                    <a href="{% url 'tienda:detalle_producto' producto.slug %}">
+                        {% if producto.imagen1 %}
+                        <img src="{{ producto.imagen1.url }}" alt="{{ producto.nombre }}" class="product-image">
+                        {% else %}
+                        <img src="{% static 'images/no-image-available.png' %}" alt="Imagen no disponible" class="product-image">
+                        {% endif %}
+                        <h3 class="text-success mt-3">{{ producto.nombre }}</h3>
+                    </a>
                 </div>
-                {% if productos|length > 9 %}
-                <div class="text-center my-4">
-                    <button class="btn btn-success ver-mas-btn" data-categoria="{{ categoria|slugify }}" data-pagina="1">Ver más</button>
-                    <button class="btn btn-outline-success ver-menos-btn d-none" data-categoria="{{ categoria|slugify }}" data-pagina="1">Ver menos</button>
-                </div>
-                {% endif %}
+                {% endfor %}
             </div>
-            {% endif %}
-        {% endfor %}
+        </div>
     </div>
 </div>
 

@@ -1,7 +1,8 @@
 {% load static %}
 {% load carrito_tags %}
+{% load custom_filters %}
 <div class="container-fluid fixed-top">
-    <!-- Top bar -->
+    <!-- Top bar (opcional, lo mantenemos igual) -->
     <div class="container-fluid topbar bg-warning d-none d-lg-block">
         <div class="d-flex justify-content-between">
             <div class="top-info ps-2">
@@ -33,15 +34,21 @@
 
     <!-- Navbar -->
     <div class="container-fluid navbar-container px-0">
-        <nav class="navbar navbar-expand-xl navbar-dark">
+        <nav class="navbar navbar-expand-xl navbar-dark bg-dark">
+            <!-- Logo y nombre -->
             <a href="{% url 'tienda:home' %}" class="navbar-brand d-flex align-items-center">
                 <img src="{% static 'favicon.ico' %}" alt="Logo" class="me-2 logo-grande">
-                <h1 class="text-white display-6">La Revolución Verde CBD</h1>
+                <h1 class="text-white display-6">LA REVOLUCIÓN VERDE CBD</h1>
             </a>
+
+            <!-- Botón de toggle para móviles -->
             <button class="navbar-toggler px-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
                 <span class="navbar-toggler-icon"></span>
             </button>
+
+            <!-- Contenido del navbar -->
             <div class="collapse navbar-collapse" id="navbarCollapse">
+                <!-- Menú principal con renderizado dinámico -->
                 <div class="navbar-nav mx-auto">
                     {% for categoria, productos in productos_por_categoria_json.items %}
                         {% if productos %}  <!-- Solo renderiza si hay productos en la categoría -->
@@ -53,60 +60,83 @@
                                aria-expanded="false">
                                {{ categoria|title }}
                             </a>
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu{{ forloop.counter }}">
-                                {% for producto in productos %}
-                                <li>
-                                    <a class="dropdown-item" 
-                                       href="{% url 'tienda:detalle_producto' producto.slug %}">
-                                       {{ producto.nombre }}
-                                    </a>
-                                </li>
-                                {% endfor %}
-                            </ul>
+                            <ul class="dropdown-menu dropdown-large" aria-labelledby="dropdownMenu{{ forloop.counter }}">
+                                <div class="d-flex">
+                                    <!-- Subcategorías dentro del flexbox, cada una como un bloque -->
+                                    <div class="subcategoria-item">
+                                        <h6 class="dropdown-header">Subcategorías</h6>
+                                        <ul class="list-unstyled">
+                                            {% for subcategoria in subcategorias_por_categoria_json|get_item:categoria %}
+                                                <li>
+                                                    <a class="dropdown-item" href="{% url 'tienda:listado_producto' %}?categoria={{ categoria|urlencode }}&subcategoria={{ subcategoria.slug }}">
+                                                        {{ subcategoria.nombre }}
+                                                    </a>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                            
+                                    <!-- Productos dentro del mismo flexbox, cada uno también en un bloque -->
+        <!-- Bloque de productos (máximo 5 productos) -->
+        <div class="productos-container d-flex flex-wrap">
+            <h6 class="dropdown-header">Productos Destacados</h6>
+            {% for producto in productos|slice:":5" %} 
+                <div class="producto-item">
+                    <a class="dropdown-item d-flex flex-column align-items-center" href="{% url 'tienda:detalle_producto' producto.slug %}">
+                        <img src="{{ producto.imagen1 }}" alt="{{ producto.nombre }}" class="miniatura">
+                        <span class="producto-nombre">{{ producto.nombre|truncatechars:30 }}</span>
+                    </a>
+                </div>
+            {% empty %}
+                <p class="text-muted">No hay productos</p>
+            {% endfor %}
+                                    </div>
+                                </div>
+                            </ul>                            
                         </div>
                         {% endif %}
                     {% endfor %}
                     <a href="#!" class="nav-item nav-link">Sobre nosotros</a>
                     <a href="{% url 'core:tienda_info' %}" class="nav-item nav-link">Contacto</a>
                 </div>
+
+                <!-- Menú de usuario, carrito y búsqueda -->
                 <ul class="navbar-nav ms-auto">
-                    <!-- Search Icon -->
+                    <!-- Búsqueda -->
                     <li class="nav-item search-container">
                         <a href="#" class="nav-link" id="searchIcon">
                             <i class="bi bi-search"></i>
-                            <div id="searchForm" class="container-fluid bg-light">
-                                <div class="container">
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <form action="{% url 'tienda:buscar' %}" method="get" class="d-flex">
-                                                <input type="text" name="q" class="form-control me-2" placeholder="Buscar productos..." value="{{ query }}">
-                                                <button type="submit" class="btn btn-success">Buscar</button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </a>
+                        <div id="searchForm" class="container-fluid bg-light">
+                            <form action="{% url 'tienda:buscar' %}" method="get" class="d-flex">
+                                <input type="text" name="q" class="form-control me-2" placeholder="Buscar productos..." value="{{ query }}">
+                                <button type="submit" class="btn btn-success">Buscar</button>
+                            </form>
+                        </div>
                     </li>
-                    <!-- Cart Icon -->
+
+                    <!-- Carrito -->
                     <li class="nav-item">
                         <a href="{% url 'carrito:carrito_detalle' %}" class="nav-link">
-                            <i class="fas fa-shopping-cart"></i> <!-- Usando Font Awesome -->
-                            <span class="badge bg-dark text-white ms-1 rounded-pill">{{ request.session.carrito|total_unidades }}</span>
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="badge bg-warning text-dark ms-1 rounded-pill">{{ request.session.carrito|total_unidades }}</span>
                         </a>
-                    </li>                                
-                    <!-- User Icon -->
+                    </li>
+
+                    <!-- Usuario -->
                     <li class="nav-item dropdown">
                         {% if not user.is_authenticated %}
                         <a href="#" class="nav-link dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-user-circle"></i>                        </a>
+                            <i class="fas fa-user-circle"></i>
+                        </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li><a class="dropdown-item" href="{% url 'account_login' %}">Entrar</a></li>
                             <li><a class="dropdown-item" href="{% url 'account_signup' %}">Registrarse</a></li>
                         </ul>
                         {% else %}
                         <a href="#" class="nav-link dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-user-circle"></i>                        </a>
+                            <i class="fas fa-user-circle"></i>
+                        </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li><a class="dropdown-item" href="{% url 'core:perfil' %}">Perfil</a></li>
                             <li><a class="dropdown-item" href="{% url 'account_email' %}">Cambiar e-mail</a></li>

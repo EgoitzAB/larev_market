@@ -1,6 +1,6 @@
 from django.utils.html import format_html
 from django.contrib import admin
-from .models import Categoria, Producto, ProductoVariante
+from .models import Categoria, Subcategoria, Producto, ProductoVariante
 
 
 # Configuración del modelo de categorías
@@ -16,6 +16,19 @@ class CategoryAdmin(admin.ModelAdmin):
             return format_html(f'<img src="{obj.imagen.url}" style="width: 50px; height: auto;" />')
         return "Sin imagen"
 
+# Configuración del modelo de subcategorías
+@admin.register(Subcategoria)
+class SubcategoriaAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'categoria', 'slug', 'thumbnail')  # Mostrar nombre, categoría y thumbnail
+    search_fields = ('nombre', 'categoria__nombre')
+    list_filter = ('categoria',)  # Filtrar por categoría
+    prepopulated_fields = {'slug': ('nombre',)}  # Autocompletar slug basado en el nombre
+
+    @admin.display(description="Imagen")
+    def thumbnail(self, obj):
+        if obj.imagen:
+            return format_html(f'<img src="{obj.imagen.url}" style="width: 50px; height: auto;" />')
+        return "Sin imagen"
 
 # Inline para gestionar variantes dentro del producto
 class ProductoVarianteInline(admin.TabularInline):
@@ -34,8 +47,8 @@ class ProductoVarianteInline(admin.TabularInline):
 # Configuración del modelo de productos
 @admin.register(Producto)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'categoria', 'is_active', 'created_at', 'updated_at', 'thumbnail')
-    list_filter = ('categoria', 'is_active')
+    list_display = ('nombre', 'categoria', 'subcategoria', 'is_active', 'created_at', 'updated_at', 'thumbnail')
+    list_filter = ('categoria', 'subcategoria', 'is_active')
     search_fields = ('nombre', 'descripcion')
     inlines = [ProductoVarianteInline]
     ordering = ('-created_at',)
@@ -51,7 +64,7 @@ class ProductAdmin(admin.ModelAdmin):
 @admin.register(ProductoVariante)
 class ProductVariantAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'producto', 'precio', 'stock', 'peso', 'talla', 'thumbnail')
-    list_filter = ('producto__categoria',)
+    list_filter = ('producto__categoria', 'producto__subcategoria')
     search_fields = ('nombre', 'sku')
 
     @admin.display(description="Imagen")

@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import TemplateView, ListView, DetailView
-from .models import Categoria, Producto, ProductoVariante
+from .models import Categoria, Producto, ProductoVariante, Subcategoria
 from carrito.forms import CarritoAñadirProductoForm
 from .recomendador import Recomendador
 from django.contrib.postgres.search import TrigramSimilarity
@@ -32,16 +32,34 @@ class CategoriasView(ListView):
         queryset = super().get_queryset()
         
         # Obtener la categoría seleccionada del parámetro 'categoria' en la URL
-        categoria_seleccionada = self.request.GET.get('categoria')
+        categoria_slug = self.kwargs.get('categoria_slug')
+        subcategoria_slug = self.kwargs.get('subcategoria_slug')
         
-        if categoria_seleccionada:
-            categoria = get_object_or_404(Categoria, nombre=categoria_seleccionada)
+        if categoria_slug:
+            categoria = get_object_or_404(Categoria, slug=categoria_slug)
             queryset = queryset.filter(categoria=categoria)
+            
+            if subcategoria_slug:
+                subcategoria = get_object_or_404(Subcategoria, slug=subcategoria_slug, categoria=categoria)
+                queryset = queryset.filter(subcategoria=subcategoria)
         
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        
+        # Obtener la categoría y subcategoría actual
+        categoria_slug = self.kwargs.get('categoria_slug')
+        subcategoria_slug = self.kwargs.get('subcategoria_slug')
+        
+        if categoria_slug:
+            categoria = get_object_or_404(Categoria, slug=categoria_slug)
+            context['categoria'] = categoria
+            context['subcategorias'] = Subcategoria.objects.filter(categoria=categoria)
+            
+            if subcategoria_slug:
+                subcategoria = get_object_or_404(Subcategoria, slug=subcategoria_slug, categoria=categoria)
+                context['subcategoria'] = subcategoria
         
         # Obtener todas las categorías para mostrarlas en el navbar o menú lateral
         context['categorias'] = Categoria.objects.all()

@@ -60,6 +60,37 @@ class Categoria(ImageOptimizableModel):
         super().save(*args, **kwargs)
         self.optimize_image(self.imagen)
 
+class Subcategoria(models.Model):
+    """
+    Subcategorías para los productos, como 'Cogollos CBD', 'Pre-Rolled CBD', etc.
+    """
+    nombre = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=300, blank=True)
+    categoria = models.ForeignKey(
+        'Categoria',
+        on_delete=models.CASCADE,
+        related_name="subcategorias",
+        help_text="Categoría a la que pertenece la subcategoría."
+    )
+    imagen = models.ImageField(
+        upload_to="subcategorias/",
+        null=True,
+        blank=True,
+        help_text="Imagen de la subcategoría (opcional)."
+    )
+
+    class Meta:
+        verbose_name = "Subcategoría"
+        verbose_name_plural = "Subcategorías"
+        ordering = ['nombre']
+
+    def __str__(self):
+        return self.nombre
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.nombre)[:250]
+        super().save(*args, **kwargs)
 
 # Productos
 class Producto(ImageOptimizableModel):
@@ -74,6 +105,14 @@ class Producto(ImageOptimizableModel):
         on_delete=models.PROTECT,
         related_name="productos",
         help_text="Categoría a la que pertenece el producto."
+    )
+    subcategoria = models.ForeignKey(
+        Subcategoria,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="productos",
+        help_text="Subcategoría a la que pertenece el producto (opcional)."
     )
     descripcion = models.TextField(blank=True, help_text="Descripción del producto.")
     imagen1 = models.ImageField(
