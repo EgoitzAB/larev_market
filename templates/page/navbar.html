@@ -51,51 +51,55 @@
                 <!-- Menú principal con renderizado dinámico -->
                 <div class="navbar-nav mx-auto">
                     {% for categoria, productos in productos_por_categoria_json.items %}
-                        {% if productos %}  <!-- Solo renderiza si hay productos en la categoría -->
-                        <div class="nav-item dropdown">
-                            <a href="{% url 'tienda:listado_producto' %}?categoria={{ categoria|urlencode }}" 
-                               class="nav-link dropdown-toggle" 
-                               id="dropdownMenu{{ forloop.counter }}" 
-                               data-bs-toggle="dropdown" 
-                               aria-expanded="false">
-                               {{ categoria|title }}
-                            </a>
-                            <ul class="dropdown-menu dropdown-large" aria-labelledby="dropdownMenu{{ forloop.counter }}">
-                                <div class="d-flex">
-                                    <!-- Subcategorías dentro del flexbox, cada una como un bloque -->
-                                    <div class="subcategoria-item">
-                                        <h6 class="dropdown-header">Subcategorías</h6>
-                                        <ul class="list-unstyled">
-                                            {% for subcategoria in subcategorias_por_categoria_json|get_item:categoria %}
-                                                <li>
-                                                    <a class="dropdown-item" href="{% url 'tienda:listado_producto' %}?categoria={{ categoria|urlencode }}&subcategoria={{ subcategoria.slug }}">
-                                                        {{ subcategoria.nombre }}
-                                                    </a>
-                                                </li>
-                                            {% endfor %}
-                                        </ul>
-                                    </div>
-                            
-                                    <!-- Productos dentro del mismo flexbox, cada uno también en un bloque -->
-        <!-- Bloque de productos (máximo 5 productos) -->
-        <div class="productos-container d-flex flex-wrap">
-            <h6 class="dropdown-header">Productos Destacados</h6>
-            {% for producto in productos|slice:":5" %} 
-                <div class="producto-item">
-                    <a class="dropdown-item d-flex flex-column align-items-center" href="{% url 'tienda:detalle_producto' producto.slug %}">
-                        <img src="{{ producto.imagen1 }}" alt="{{ producto.nombre }}" class="miniatura">
-                        <span class="producto-nombre">{{ producto.nombre|truncatechars:30 }}</span>
-                    </a>
-                </div>
-            {% empty %}
-                <p class="text-muted">No hay productos</p>
-            {% endfor %}
-                                    </div>
+                    {% if productos %}  <!-- Solo renderiza si hay productos en la categoría -->
+                    <div class="nav-item dropdown">
+                        <a href="{% url 'tienda:listado_producto' %}?categoria={{ categoria|urlencode }}" 
+                           class="nav-link dropdown-toggle" 
+                           id="dropdownMenu{{ forloop.counter }}" 
+                           data-bs-toggle="dropdown" 
+                           aria-expanded="false">
+                           {{ categoria|title }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-large" aria-labelledby="dropdownMenu{{ forloop.counter }}">
+                            <div class="d-flex">
+                                {% with subcategorias=subcategorias_por_categoria_json|get_item:categoria %}
+                                {% if subcategorias %}
+                                <!-- Subcategorías solo si existen -->
+                                <div class="subcategoria-item">
+                                    <h6 class="dropdown-header">Subcategorías</h6>
+                                    <ul class="list-unstyled">
+                                        {% for subcategoria in subcategorias %}
+                                            <li>
+                                                <a class="dropdown-item" href="{% url 'tienda:listado_producto' %}?categoria={{ categoria|urlencode }}&subcategoria={{ subcategoria.slug }}">
+                                                    {{ subcategoria.nombre }}
+                                                </a>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
                                 </div>
-                            </ul>                            
-                        </div>
-                        {% endif %}
-                    {% endfor %}
+                                {% endif %}
+                                {% endwith %}
+                
+                                <!-- Bloque de productos (máximo 5 productos) -->
+                                <div class="productos-container d-flex flex-wrap">
+                                    <h6 class="dropdown-header">Productos Destacados</h6>
+                                    {% for producto in productos|slice:":5" %} 
+                                        <div class="producto-item">
+                                            <a class="dropdown-item d-flex flex-column align-items-center" href="{% url 'tienda:detalle_producto' producto.slug %}">
+                                                <img src="{{ producto.imagen1 }}" alt="{{ producto.nombre }}" class="miniatura">
+                                                <span class="producto-nombre">{{ producto.nombre|truncatechars:30 }}</span>
+                                            </a>
+                                        </div>
+                                    {% empty %}
+                                        <p class="text-muted">No hay productos</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </ul>                            
+                    </div>
+                    {% endif %}
+                {% endfor %}
+                
                     <a href="#!" class="nav-item nav-link">Sobre nosotros</a>
                     <a href="{% url 'core:tienda_info' %}" class="nav-item nav-link">Contacto</a>
                 </div>
