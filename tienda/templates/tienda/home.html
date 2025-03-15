@@ -50,12 +50,12 @@ Tienda de productos de CBD, página principal
 
         <!-- Botones de categorías -->
         <div class="category-buttons my-3 d-flex flex-wrap gap-2">
-            <button class="btn btn-outline-success rounded-pill category-btn" data-category="all">
+            <button class="btn btn-outline-success category-btn" data-category="all">
                 Todo
             </button>
             {% for categoria, productos in productos_por_categoria_json.items %}
                 {% if productos %}  <!-- Solo renderiza si hay productos en la categoría -->
-                <button class="btn btn-outline-success rounded-pill category-btn" data-category="{{ categoria|slugify }}">
+                <button class="btn btn-outline-success category-btn" data-category="{{ categoria|slugify }}">
                     {{ categoria|title }}
                 </button>
                 {% endif %}
@@ -100,10 +100,6 @@ Tienda de productos de CBD, página principal
                                     {% if variante.stock > 0 %}Añadir al carrito{% else %}No hay stock{% endif %}
                                 </button>
                             </form>
-                                <!-- Botón de Favoritos con Font Awesome -->
-                                <button class="favorito-btn" data-variante-id="{{ variante.id }}">
-                                    <i class="{% if variante in favoritos %}fa-solid text-danger{% else %}fa-regular{% endif %} fa-heart"></i>
-                                </button>
                         </div>
                         {% endfor %}
                     </div>

@@ -61,7 +61,7 @@
                            {{ categoria|title }}
                         </a>
                         <ul class="dropdown-menu dropdown-large" aria-labelledby="dropdownMenu{{ forloop.counter }}">
-                            <div class="d-flex">
+                            <div class="d-md-flex">
                                 {% with subcategorias=subcategorias_por_categoria_json|get_item:categoria %}
                                 {% if subcategorias %}
                                 <!-- Subcategorías solo si existen -->
@@ -81,11 +81,11 @@
                                 {% endwith %}
                 
                                 <!-- Bloque de productos (máximo 5 productos) -->
-                                <div class="productos-container d-flex flex-wrap">
+                                <div class="productos-container d-md-flex flex-wrap">
                                     <h6 class="dropdown-header">Productos Destacados</h6>
-                                    {% for producto in productos|slice:":5" %} 
+                                    {% for producto in productos|slice:":6" %} 
                                         <div class="producto-item">
-                                            <a class="dropdown-item d-flex flex-column align-items-center" href="{% url 'tienda:detalle_producto' producto.slug %}">
+                                            <a class="dropdown-item d-md-flex flex-column align-items-center" href="{% url 'tienda:detalle_producto' producto.slug %}">
                                                 <img src="{{ producto.imagen1 }}" alt="{{ producto.nombre }}" class="miniatura">
                                                 <span class="producto-nombre">{{ producto.nombre|truncatechars:30 }}</span>
                                             </a>

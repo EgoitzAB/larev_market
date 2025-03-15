@@ -166,6 +166,7 @@ body {
     .dropdown-large {
         flex-direction: column; /* En móviles, se apilan */
         width: 100%;
+        max-width: 100% !important;
     }
 
     .subcategoria-item {
@@ -173,7 +174,7 @@ body {
     }
 
     .productos-container {
-        width: 70%; /* Damos más espacio a los productos */
+        width: 60%; /* Damos más espacio a los productos */
         flex-wrap: wrap;
     }
 
@@ -188,12 +189,14 @@ body {
     }
 
     .dropdown-large:has(.subcategoria-item:empty) .producto-item {
-        width: 33%; /* Se muestran en 3 columnas */
+        width: 45%; /* Se muestran en 3 columnas */
     }
 
     .miniatura {
-        width: 60px; /* Ajustamos tamaño de imagen */
-        height: 60px;
+        width: 100%;
+        max-width: 50px;
+        height: auto;
+        object-fit: contain;
     }
     .navbar {
         display: flex;
@@ -253,7 +256,7 @@ body {
 /* Ajustar el tamaño del contenedor para evitar el solapamiento */
 /* Contenedor general */
 .dropdown-large {
-    width: 600px;
+    max-width: 80%;
     padding: 15px;
     display: flex;
     flex-wrap: wrap;
@@ -503,10 +506,9 @@ h2.text-success {
 
 /* Tarjetas de productos */
 .product-card {
-    background: white;
-    border-radius: 8px;
+    background: rgb(0, 0, 0);
+    color: white;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 20px;
     text-align: center;
     transition: transform 0.3s, box-shadow 0.3s;
 }
@@ -518,9 +520,8 @@ h2.text-success {
 
 .product-card img {
     max-width: 100%;
-    max-height: 200px;
+    max-height: 300px;
     object-fit: cover;
-    border-radius: 4px;
     margin-bottom: 10px;
 }
 
@@ -531,6 +532,14 @@ h2.text-success {
     margin-bottom: 10px;
 }
 
+.product-card {
+    transition: transform 0.2s;
+}
+
+.product-card:hover {
+    transform: scale(1.05);
+}
+
 /* Variantes de productos */
 /* Contenedor de variantes */
 .variants {
@@ -539,7 +548,6 @@ h2.text-success {
     gap: 10px; /* Espacio entre las variantes */
     margin-top: 1rem;
     padding: 0.5rem;
-    border-top: 1px solid #ddd;
 }
 
 /* Estilos individuales para cada variante */
@@ -548,7 +556,7 @@ h2.text-success {
     box-sizing: border-box; /* Incluir padding y border dentro del ancho */
     margin-bottom: 0.5rem;
     padding: 0.5rem;
-    background: #f9f9f9;
+    background: #000000;
     border-radius: 5px;
     text-align: center; /* Centrar texto */
     transition: transform 0.2s, box-shadow 0.2s;
@@ -620,14 +628,6 @@ h2.text-success {
     gap: 1rem;
     transition: all 0.3s ease-in-out;
 } */
-
-.product-card {
-    transition: transform 0.2s;
-}
-
-.product-card:hover {
-    transform: scale(1.05);
-}
 
 .category-buttons {
     margin-bottom: 1rem;
