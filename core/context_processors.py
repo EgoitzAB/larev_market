@@ -12,6 +12,7 @@ def productos_por_categoria(request):
                 'slug': producto.slug,
                 'descripcion': producto.descripcion,
                 'imagen1': producto.imagen1.url if producto.imagen1 else None,
+                'imagen2': producto.imagen2.url if producto.imagen2 else None,
                 'variantes': [
                     {
                         'id': variante.id,
