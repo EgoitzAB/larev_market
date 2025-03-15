@@ -117,6 +117,13 @@ body {
     color: #ffcc00 !important; /* Texto amarillo al hacer hover */
 }
 
+.dropdown-large {
+    min-width: 60% !important; /* Ancho mínimo del menú desplegable */
+    padding: 15px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
 /* Search Icon */
 .search-container {
     position: relative;
@@ -255,12 +262,7 @@ body {
 
 /* Ajustar el tamaño del contenedor para evitar el solapamiento */
 /* Contenedor general */
-.dropdown-large {
-    max-width: 80%;
-    padding: 15px;
-    display: flex;
-    flex-wrap: wrap;
-}
+
 
 /* Bloque de subcategorías */
 .subcategoria-item {
@@ -525,15 +527,76 @@ h2.text-success {
     margin-bottom: 10px;
 }
 
-.product-card {
-    transition: transform 0.2s;
+.product-image {
+    position: relative;
+    display: block;
 }
 
-.product-card:hover {
-    transform: scale(1.05);
+.product-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: opacity 0.3s ease-in-out;
 }
 
+/* Oculta la imagen de hover por defecto */
+.product-image .hover-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    display: none;
+}
+
+/* Al hacer hover, muestra la segunda imagen y oculta la primera */
+.product-image:hover .primary-image {
+    opacity: 0;
+}
+
+.product-image:hover .hover-image {
+    opacity: 1;
+    display: block;
+}
 /* Variantes de productos */
+.product-image-container {
+    position: relative;
+    display: inline-block;
+}
+
+.add-to-cart-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.product-card:hover .add-to-cart-overlay {
+    display: flex;
+}
+
+.add-to-cart-overlay button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.add-to-cart-overlay button:hover {
+    background-color: #218838;
+}
+
 /* Contenedor de variantes */
 .variants {
     display: flex; /* Utilizar flexbox para alinear las variantes en línea */
@@ -607,13 +670,7 @@ h2.text-success {
     font-weight: bold;
 }
 
-/* Estilo para las imágenes del producto */
-.product-image {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    object-fit: cover;
-}
+
 
 /* .product-grid {
     display: grid;
