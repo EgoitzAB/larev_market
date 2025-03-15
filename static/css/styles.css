@@ -483,27 +483,20 @@ h2.text-success {
     padding: 20px;
 }
 
-/* Una columna en pantallas pequeñas */
-@media (max-width: 576px) {
-    .product-grid {
-        grid-template-columns: 1fr;
-    }
-}
 
-/* Dos columnas en pantallas medianas */
-@media (min-width: 577px) and (max-width: 992px) {
+/* Dos columnas en pantallas pequeñas y medianas */
+@media (max-width: 992px) {
     .product-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
-/* Tres columnas en pantallas grandes */
+/* Cuatro columnas en pantallas grandes */
 @media (min-width: 993px) {
     .product-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(4, 1fr);
     }
 }
-
 /* Tarjetas de productos */
 .product-card {
     background: rgb(0, 0, 0);
