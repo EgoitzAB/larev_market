@@ -16,7 +16,6 @@ __pycache__/
 settings_local.py
 
 # Archivos generados estáticos y de medios
-/static/
 media/
 *.log
 *.pot

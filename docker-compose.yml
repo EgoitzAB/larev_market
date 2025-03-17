@@ -14,6 +14,8 @@ services:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
+    networks:
+      - larev-network
 
   redis-server:
     image: redis:latest
@@ -23,12 +25,16 @@ services:
       - "6379:6379"
     volumes:
       - redis-data:/data
-  
+    networks:
+      - larev-network
+
   rabbitmq:
     image: "rabbitmq:3-management"
     ports:
       - "5672:5672"
       - "15672:15672"  # Interfaz web de RabbitMQ
+    networks:
+      - larev-network
 
   celery_worker:
     build: .
@@ -50,7 +56,13 @@ services:
     depends_on:
       - rabbitmq
       - redis-server
+    networks:
+      - larev-network
 
 volumes:
   postgres_data:
   redis-data:
+
+networks:
+  larev-network:
+    driver: bridge

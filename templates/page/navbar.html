@@ -66,12 +66,11 @@
                                 {% if subcategorias %}
                                 <!-- Subcategorías solo si existen -->
                                 <div class="subcategoria-item">
-                                    <h6 class="dropdown-header">Subcategorías</h6>
                                     <ul class="list-unstyled">
                                         {% for subcategoria in subcategorias %}
                                             <li>
                                                 <a class="dropdown-item" href="{% url 'tienda:listado_producto' %}?categoria={{ categoria|urlencode }}&subcategoria={{ subcategoria.slug }}">
-                                                    {{ subcategoria.nombre }}
+                                                    {{ subcategoria.nombre|title }}
                                                 </a>
                                             </li>
                                         {% endfor %}
@@ -82,12 +81,11 @@
                 
                                 <!-- Bloque de productos (máximo 5 productos) -->
                                 <div class="productos-container d-md-flex flex-wrap">
-                                    <h6 class="dropdown-header">Productos Destacados</h6>
                                     {% for producto in productos|slice:":6" %} 
                                         <div class="producto-item">
                                             <a class="dropdown-item d-md-flex flex-column align-items-center" href="{% url 'tienda:detalle_producto' producto.slug %}">
                                                 <img src="{{ producto.imagen1 }}" alt="{{ producto.nombre }}" class="miniatura">
-                                                <span class="producto-nombre">{{ producto.nombre|truncatechars:30 }}</span>
+                                                <span class="producto-nombre">{{ producto.nombre|truncatechars:30|title }}</span>
                                             </a>
                                         </div>
                                     {% empty %}
