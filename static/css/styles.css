@@ -340,62 +340,44 @@ body {
     transition: color 0.5s;
 }
 
-.sort-options select {
-    border-color: #000000;
-    color: #ffffff;
+/* Estilo general para los botones de ordenación y categorías */
+.sort-btn, .category-btn {
+    background: none; /* Sin fondo */
+    border: none; /* Sin bordes */
+    color: white !important; /* Texto blanco siempre */
+    font-size: 1rem;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative; /* Necesario para la línea en hover */
 }
 
-.sort-options select:focus {
-    border-color: #ffffff;
-    box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+/* Efecto de línea blanca al hacer hover */
+.sort-btn::after,
+.category-btn::after {
+    content: ''; 
+    position: absolute;
+    left: 0;
+    bottom: -2px; /* Posiciona la línea justo debajo del texto */
+    width: 0;
+    height: 2px;
+    background-color: white;
+    transition: width 0.3s ease-in-out;
 }
 
-.category-buttons button {
-    transition: background-color 0.3s, color 0.3s;
+/* Hace que la línea aparezca al hacer hover */
+.sort-btn:hover::after,
+.category-btn:hover::after {
+    width: 100%; /* Línea se expande al hacer hover */
 }
 
-.category-buttons button:hover {
-    background-color: #198754;
-    color: white;
+/* Ajusta el espaciado y evita el salto de línea */
+.sort-options, .category-buttons {
+    display: flex;
+    gap: 15px; /* Espacio entre los botones */
+    flex-wrap: nowrap; /* Evita que los botones se envuelvan a otra línea */
 }
 
-/* Botones de categoría */
-.category-buttons .btn {
-    font-size: 1.2rem; /* Aumenta el tamaño del texto */
-    padding: 0.5rem 1.5rem; /* Aumenta el tamaño general */
-    transition: background-color 0.3s, transform 0.2s;
-}
-
-.category-buttons .btn:hover {
-    background-color: #198754;
-    color: white;
-    transform: scale(1.05); /* Efecto de agrandamiento */
-}
-
-.category-buttons .btn.active {
-    background-color: #14532d;
-    color: white;
-    font-weight: bold;
-    border: 2px solid #198754;
-}
-
-/* Estilo de los títulos de las categorías */
-h2.text-success {
-    border-bottom: 3px solid #198754;
-    padding-bottom: 8px;
-    font-size: 2rem;
-}
-
-/* Contenedor de ordenación */
-.sort-options {
-    margin-left: 1rem; /* Ajusta según el diseño */
-}
-
-h2.text-success {
-    border-bottom: 2px solid #198754;
-    padding-bottom: 8px;
-    margin-bottom: 16px;
-}
 
 .disabled {
     background-color: #ccc;
@@ -859,36 +841,30 @@ h2.text-success {
     border-color: var(--primary-color);
 }
 
-
 /* Footer General */
 .footer {
-    background-color: var(--primary-color);
-    color: var(--dark-color);
+    background-color: var(--dark-color); /* Cambié de color primario a oscuro */
+    color: var(--light-color); /* Cambié el texto claro al color más claro */
     padding: 40px 20px;
     overflow: hidden;
-}
-
-.row, .col-lg-4 {
-    box-sizing: border-box;
-    max-width: 100%;
 }
 
 .footer .footer-item h4 {
     font-size: 1.2rem;
     margin-bottom: 15px;
-    color: var(--dark-color)
+    color: var(--light-color); /* Cambié el color del texto a claro */
 }
 
 .footer .footer-item p,
 .footer .footer-item a {
     font-size: 0.9rem;
     line-height: 1.6;
-    color: var(--text-color);
+    color: var(--light-color); /* Cambié el texto a color claro */
 }
 
 .footer .footer-item a:hover {
     text-decoration: underline;
-    color: var(--secondary-color);
+    color: var(--primary-color); /* Cambié el color al color primario */
 }
 
 /* Botones sociales */
@@ -899,69 +875,16 @@ h2.text-success {
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid var(--light-color);
+    border: 1px solid var(--light-color); /* Cambié el borde a color claro */
     transition: all 0.3s ease;
 }
 
 .footer .btn-md-square:hover {
-    background-color: var(--light-color);
-    color: var(--black-color);
+    background-color: var(--primary-color); /* Cambié el fondo al color primario */
+    color: var(--dark-color); /* Cambié el texto al color oscuro */
 }
 
 /* Responsivo */
-@media (max-width: 768px) {
-    .footer .footer-item {
-        text-align: center;
-    }
-}
-
-.footer .btn {
-    background-color: transparent;
-    border: 1px solid var(--secondary-color);
-    color: var(--secondary-color);
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-}
-
-.footer .btn:hover {
-    background-color: var(--secondary-color);
-    color: var(--black-color);
-}
-
-.footer .btn-link {
-    font-size: 0.9rem;
-    color: var(--text-color);
-    padding: 5px 0;
-    transition: all 0.3s ease;
-}
-
-.footer .btn-link:hover {
-    color: var(--secondary-color);
-    text-decoration: underline;
-}
-
-/* Social Icons */
-.footer .btn-md-square {
-    width: 40px;
-    height: 40px;
-    border: 1px solid var(--black-color);
-    background-color: transparent;
-    color: var(--black-color);
-    font-size: 1rem;
-    transition: all 0.3s ease;
-}
-
-.footer .btn-md-square:hover {
-    background-color: var(--black-color);
-    color: var(--primary-color);
-}
-
-/* Divider */
-.footer .pb-4 {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-/* Responsive Adjustments */
 @media (max-width: 768px) {
     .footer .footer-item {
         text-align: center;
@@ -972,10 +895,56 @@ h2.text-success {
     }
 }
 
+.footer .btn {
+    background-color: var(--primary-color); /* Cambié el fondo al color primario */
+    border: 1px solid var(--primary-color); /* Cambié el borde al color primario */
+    color: var(--light-color); /* Cambié el texto a color claro */
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.footer .btn:hover {
+    background-color: var(--light-color); /* Cambié el fondo al color claro */
+    color: var(--dark-color); /* Cambié el texto al color oscuro */
+}
+
+.footer .btn-link {
+    font-size: 0.9rem;
+    color: var(--light-color); /* Cambié el color del enlace a color claro */
+    padding: 5px 0;
+    transition: all 0.3s ease;
+}
+
+.footer .btn-link:hover {
+    color: var(--primary-color); /* Cambié el color de hover al color primario */
+    text-decoration: underline;
+}
+
+/* Social Icons */
+.footer .btn-md-square {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--black-color); /* Cambié el borde a color negro */
+    background-color: transparent;
+    color: var(--black-color); /* Cambié el color del icono a negro */
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.footer .btn-md-square:hover {
+    background-color: var(--black-color); /* Cambié el fondo al negro */
+    color: var(--primary-color); /* Cambié el texto al color primario */
+}
+
+/* Divider */
+.footer .pb-4 {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Cambié el borde a color blanco */
+}
+
 /* Copyright */
 .copyright {
-    background-color: var(--secondary-color);
-    color: var(--background-color);
+    background-color: var(--primary-color); /* Cambié el fondo al color primario */
+    color: var(--background-color); /* Cambié el texto al color de fondo (blanco) */
     text-align: center;
     font-size: 0.9rem;
 }

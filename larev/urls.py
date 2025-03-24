@@ -26,6 +26,7 @@ urlpatterns = [
     path('carrito/', include('carrito.urls', namespace='carrito')),
     path('checkout/', include('checkout.urls', namespace='checkout')),
     path('pagos/', include('pagos.urls')),
+    path('cupones/', include('coupon.urls', namespace='coupon')),
     path('', include('tienda.urls')),
     path('', include('core.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

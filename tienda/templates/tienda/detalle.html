@@ -47,11 +47,11 @@
                     {% endif %}
 
                     <!-- Formulario para añadir variante al carrito -->
-                    <form method="post" action="{% url 'carrito:carrito_añadir' producto_id=variante.id %}">
+                    <form method="post" action="{% url 'carrito:carrito_añadir' %}">
                         {% csrf_token %}
                         <input type="hidden" name="cantidad" value="1">
                         <input type="hidden" name="variante_id" value="{{ variante.id }}">
-                        <button type="submit" class="btn btn-success w-100">
+                        <button type="submit" class="btn btn-dark border-light text-light">
                             <i class="fas fa-cart-plus"></i> Añadir al carrito
                         </button>
                     </form>
@@ -81,10 +81,11 @@
             {% endif %}
 
             <!-- Formulario para añadir la variante al carrito -->
-            <form method="post" action="{% url 'carrito:carrito_añadir' producto_id=objeto.id %}">
+            <form method="post" action="{% url 'carrito:carrito_añadir' %}">
                 {% csrf_token %}
+                <input type="hidden" name="variante_id" value="{{ objeto.id }}">
                 <input type="hidden" name="cantidad" value="1">
-                <button type="submit" class="btn btn-success w-100">
+                <button type="submit" class="btn btn-dark border-light text-light">
                     <i class="fas fa-cart-plus"></i> Añadir al carrito
                 </button>
             </form>

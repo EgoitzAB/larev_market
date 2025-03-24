@@ -34,28 +34,26 @@ Tienda de productos de CBD, página principal
 <!-- Contenedor con margen -->
 <div class="container my-4">
     <!-- Contenedor para ordenación y botones de categoría -->
-    <div class="d-flex justify-home-content align-items-center flex-wrap gap-3">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
         <!-- Ordenación -->
         <div class="sort-options d-flex align-items-center gap-3">
-            <label for="sortOrder" class="form-label m-0 fw-bold">Ordenar por:</label>
-            <select id="sortOrder" class="form-select form-select-sm w-auto" onchange="ordenarProductos()">
-                <option value="precio_asc">Precio: Menor a mayor</option>
-                <option value="precio_desc">Precio: Mayor a menor</option>
-                <option value="nombre_asc">Nombre: A a Z</option>
-                <option value="nombre_desc">Nombre: Z a A</option>
-                <option value="novedades">Novedades</option>
-                <option value="popularidad">Popularidad</option>
-            </select>
+            <!-- Convertimos el select a botones de ordenación -->
+            <button class="btn sort-btn" data-sort="precio_asc" onclick="ordenarProductos('precio_asc')">Precio: Menor a mayor</button>
+            <button class="btn sort-btn" data-sort="precio_desc" onclick="ordenarProductos('precio_desc')">Precio: Mayor a menor</button>
+            <button class="btn sort-btn" data-sort="nombre_asc" onclick="ordenarProductos('nombre_asc')">Nombre: A a Z</button>
+            <button class="btn sort-btn" data-sort="nombre_desc" onclick="ordenarProductos('nombre_desc')">Nombre: Z a A</button>
+            <button class="btn sort-btn" data-sort="novedades" onclick="ordenarProductos('novedades')">Novedades</button>
+            <button class="btn sort-btn" data-sort="popularidad" onclick="ordenarProductos('popularidad')">Popularidad</button>
         </div>
 
         <!-- Botones de categorías -->
-        <div class="category-buttons my-3 d-flex flex-wrap gap-2">
-            <button class="btn btn-outline-success category-btn" data-category="all">
+        <div class="category-buttons my-3 d-flex gap-3">
+            <button class="btn category-btn" data-category="all">
                 Todo
             </button>
             {% for categoria, productos in productos_por_categoria_json.items %}
                 {% if productos %}  <!-- Solo renderiza si hay productos en la categoría -->
-                <button class="btn btn-outline-success category-btn" data-category="{{ categoria|slugify }}">
+                <button class="btn category-btn" data-category="{{ categoria|slugify }}">
                     {{ categoria|title }}
                 </button>
                 {% endif %}
@@ -66,7 +64,7 @@ Tienda de productos de CBD, página principal
 
 <section>
     {% for categoria, productos in productos_por_categoria_json.items %}
-        {% if productos %}  <!-- Solo renderiza si hay productos en la categoría -->
+        {% if productos %}
         <div id="{{ categoria|slugify }}" class="category-section">
             <h2 class="text-success text-center my-4 py-2 border-bottom">{{ categoria|title }}</h2>            
             <div class="product-grid">
@@ -82,21 +80,33 @@ Tienda de productos de CBD, página principal
                     {% else %}
                     <p>Imagen no disponible</p>
                     {% endif %}
-                    <h3>{{ producto.nombre }}</h3>
-        <!-- Botón Añadir al carrito encima de la imagen -->
-        <div class="add-to-cart-overlay">
-            {% for variante in producto.variantes %}
-            <form method="post" action="{% url 'carrito:carrito_añadir' producto_id=variante.id %}">
-                {% csrf_token %}
-                <input type="hidden" name="cantidad" value="1">
-                <input type="hidden" name="variante_id" value="{{ variante.id }}">
-                <input type="hidden" name="sobreescribir" value="false">
-                <button type="submit" class="btn btn-success {% if variante.stock <= 0 %}btn-disabled{% endif %}" {% if variante.stock <= 0 %}disabled{% endif %}>
-                    {% if variante.stock > 0 %}Añadir al carrito{% else %}No hay stock{% endif %}
-                </button>
-            </form>
-            {% endfor %}
-        </div>
+                    
+
+                    <!-- Verificamos si hay variantes disponibles antes de mostrar el formulario -->
+                    <form method="post" action="{% url 'carrito:carrito_añadir' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-dark border-light text-light">Comprar</button>                    
+                        <h3>{{ producto.nombre }}</h3>
+                        <div id="info-variante" class="mb-2">
+                            <p><strong>Precio:</strong> <span id="precio-seleccionado">€{{ producto.variantes.0.precio }}</span></p>
+                            <p><strong>Peso:</strong> <span id="peso-seleccionado">{{ producto.variantes.0.peso }}g</span></p>
+                        </div>
+                        <div class="peso-opciones">
+                            {% for variante in producto.variantes %}
+                            <label>
+                                <input type="radio" id="variante_{{ variante.id }}" name="variante_id" value="{{ variante.id }}" required 
+                                data-precio="{{ variante.precio }}" 
+                                data-peso="{{ variante.peso }}" 
+                                {% if forloop.first %}checked{% endif %} {% if variante.stock <= 0 %}disabled{% endif %}>                                
+                                <span>{{ variante.peso }}g</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                
+                        <input type="hidden" name="cantidad" value="1">
+                        <input type="hidden" name="sobreescribir" value="false">
+                    </form>
+                
                 </div>
                 {% endfor %}
             </div>
@@ -111,11 +121,12 @@ Tienda de productos de CBD, página principal
     {% endfor %}
 </section>
 
+
 <!-- Exponer los datos como JSON para manipular con JS -->
 
 <script src="{% static 'js/paginacion.js' %}"></script>
 <script src="{% static 'js/favoritos.js' %}"></script>
-
+<script src="{% static 'js/home.js' %}"></script>
 {% endblock %}
 
 
