@@ -26,8 +26,8 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-7y14cf!h6-9l3ulf8mv=dq@6i=llj%$3+tud_ij(@)0gl-kbb%')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG') == 'True'
-#DEBUG = False
+# DEBUG = os.getenv('DEBUG') == 'True'
+DEBUG = False
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'larevolucionverde.es').split(',')
 
@@ -54,7 +54,6 @@ INSTALLED_APPS = [
     'allauth.mfa',
 
     'django_countries',
-    'localflavor',
     
     'core',
     'tienda',
@@ -63,11 +62,11 @@ INSTALLED_APPS = [
     'checkout',
 ]
 
-#CSRF_TRUSTED_ORIGINS = [
- #   'https://larevolucionverde.es',
-  #  'https://www.larevolucionverde.es',
-   # 'https://localhost',
-#]
+CSRF_TRUSTED_ORIGINS = [
+    'https://larevolucionverde.es',
+    'https://www.larevolucionverde.es',
+    'https://localhost',
+]
 
 MIDDLEWARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
@@ -220,7 +219,7 @@ LOGIN_URL = 'account_login'
 PAYGREEN_SHOP_ID = os.getenv('PAYGREEN_SHOP_ID', 'default-public-key')
 PAYGREEN_SECRET_KEY = os.getenv('PAYGREEN_SECRET_KEY', 'default-private-key')
 PAYGREEN_API_URL = os.getenv('PAYGREEN_API_URL', 'https://default-paygreen-url.com')
-#SITE_URL = os.getenv("SITE_URL")
+SITE_URL = os.getenv("SITE_URL")
 GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 
 LOGGING = {
@@ -240,15 +239,16 @@ LOGGING = {
     },
 }
 
-#SECURE_HSTS_SECONDS = 0  # 1 año
-#SECURE_HSTS_INCLUDE_SUBDOMAINS = False
-#SECURE_HSTS_PRELOAD = False
-#SECURE_SSL_REDIRECT = False
-#SESSION_COOKIE_SECURE = False
-#CSRF_COOKIE_SECURE = False
-#SECURE_BROWSER_XSS_FILTER = False
-#SECURE_CONTENT_TYPE_NOSNIFF = False
-#X_FRAME_OPTIONS = 'ALLOWALL'
-#SECURE_BROWSER_XSS_FILTER = False
-#SECURE_SSL_HOST = False
-#SECURE_REFERRER_POLICY = 'same-origin'
+SECURE_HSTS_SECONDS = 31536000  # 1 año
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+SECURE_SSL_REDIRECT = True
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_SSL_HOST = True
+SECURE_REFERRER_POLICY = 'same-origin'

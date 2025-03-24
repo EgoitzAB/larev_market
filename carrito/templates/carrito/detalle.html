@@ -10,6 +10,13 @@
 {% endblock navbar %}
 
 {% block content %}
+{% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+    </div>
+{% endfor %}
+
+
   <div class="cart-container">
     <h1 class="cart-title">Tu carrito de compras</h1>
     <div class="cart-table-container">
@@ -38,12 +45,13 @@
                   {% if item.variante and item.variante.stock <= 0 %}
                     <p class="stock-error">No hay stock disponible</p>
                   {% else %}
-                    <form action="{% url 'carrito:carrito_añadir' producto.id %}" method="post" class="quantity-form">
-                      {{ item.FormActualizarProducto.cantidad }}
-                      {{ item.FormActualizarProducto.sobreescribir }}
-                      <button type="submit" class="update-button">Actualizar</button>
-                      {% csrf_token %}
-                    </form>
+                  <form action="{% url 'carrito:carrito_añadir' %}" method="post" class="quantity-form">
+                    <input type="hidden" name="variante_id" value="{{ variante.id }}">
+                    {{ item.FormActualizarProducto.cantidad }}
+                    {{ item.FormActualizarProducto.sobreescribir }}
+                    <button type="submit" class="update-button">Actualizar</button>
+                    {% csrf_token %}
+                  </form>
                   {% endif %}
                 </td>
                 <td class="cart-item-remove">
@@ -57,12 +65,31 @@
               </tr>
             {% endwith %}
           {% endfor %}
+          {% if carrito.coupon %}
+            <tr class="subtotal">
+              <td colspan="5" class="subtotal-label">Subtotal</td>
+              <td class="subtotal-price">${{ carrito.carrito_total|floatformat:2 }}</td>
+            </tr>
+            <tr class="coupon">
+              <td colspan="5" class="coupon-label">Cupón "{{ carrito.coupon.code }}"</td>
+              <td class="coupon-price">- ${{ carrito.get_discount|floatformat:2 }}</td>
+            <td class="num neg">
+              - €{{ carrito.get_discount|floatformat:2 }}
+            </td>
+            </tr>
+          {% endif %}
           <tr class="cart-total">
             <td colspan="5" class="total-label">Total</td>
-            <td class="total-price">${{ carrito.carrito_total|floatformat:2 }}</td>
+            <td class="total-price">${{ carrito.get_total_price_after_discount|floatformat:2 }}</td>
           </tr>
         </tbody>
       </table>
+      <p>Aplicar un cupón:</p>
+      <form action="{% url 'coupon:apply' %}" method="post" class="coupon-form">
+        {% csrf_token %}
+        {{ coupon_apply_form.as_p }}
+        <input type="submit" value="Aplicar" class="apply-button" placeholder="Ingresa tu cupón">
+      </form>
     </div>
 
     {% if productos_recomendados %}

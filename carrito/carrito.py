@@ -1,12 +1,8 @@
 from decimal import Decimal
 from django.conf import settings
-from tienda.models import Producto
-
-
-from decimal import Decimal
-from django.conf import settings
+from coupon.models import Coupon
 from tienda.models import Producto, ProductoVariante
-
+from django.contrib import messages
 
 class Carrito:
     def __init__(self, request):
@@ -18,6 +14,7 @@ class Carrito:
         if not carrito:
             carrito = self.session[settings.CARRITO_SESSION_ID] = {}
         self.carrito = carrito
+        self.coupon_id = self.session.get('coupon_id')
 
     def __iter__(self):
         """
@@ -95,20 +92,31 @@ class Carrito:
         """
         self.session.modified = True
 
-#    @property
- #   def coupon(self):
-  #      if self.coupon_id:
-   #         try:
-    #            return Coupon.objects.get(id=self.coupon_id)
-     #       except Coupon.DoesNotExist:
-      #          pass
-       # return None
+    @property
+    def coupon(self):
+        if self.coupon_id:
+            try:
+                return Coupon.objects.get(id=self.coupon_id)
+            except Coupon.DoesNotExist:
+                self.session['coupon_id'] = None
+                messages.error("El cupón no es válido o ha expirado.")
+        return None
+    
+    def apply_coupon(self, coupon_id):
+        self.session['coupon_id'] = coupon_id
+        self.save()
 
-#    def get_discount(self):
- #       if self.coupon:
-  #          return (self.coupon.discount / Decimal(100)) \
-   #             * self.get_total_price()
-    #    return Decimal(0)
+    def remove_coupon(self):
+        self.session['coupon_id'] = None
+        self.save()
 
-    #def get_total_price_after_discount(self):
-     #   return self.get_total_price() - self.get_discount()
+    def get_discount(self):
+        if self.coupon:
+            return (self.coupon.discount / Decimal(100)) \
+                * self.carrito_total()
+        return Decimal(0)
+
+    def get_total_price_after_discount(self):
+        """ Obtiene el total del carrito después del descuento, asegurando que no sea negativo. """
+        total_con_descuento = self.carrito_total() - self.get_discount()
+        return max(total_con_descuento, Decimal(0))
