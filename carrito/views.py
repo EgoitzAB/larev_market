@@ -58,7 +58,7 @@ def carrito_detalle(request):
        
     for item in carrito:
         item['FormActualizarProducto'] = CarritoAñadirProductoForm(initial={
-                            'cantidad': item['cantidad'],
+                            'cantidad': item.get('cantidad', 1),
                             'sobrescribir': True})
 
     coupon_apply_form = CouponApplyForm()

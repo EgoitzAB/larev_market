@@ -5,7 +5,6 @@ app_name = 'tienda'
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
-    path('verificar-edad/', verificar_edad, name='verificar_edad'),
     path('productos/', CategoriasView.as_view(), name='listado_producto'),  # Listado general de productos
     path('productos/categoria/<slug:categoria_slug>/', CategoriasView.as_view(), name='listado_categoria'),  # Listado por categoría
     path('productos/categoria/<slug:categoria_slug>/<slug:subcategoria_slug>/', CategoriasView.as_view(), name='listado_subcategoria'),  # Listado por subcategoría

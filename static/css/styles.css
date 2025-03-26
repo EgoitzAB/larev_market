@@ -378,6 +378,19 @@ body {
     flex-wrap: nowrap; /* Evita que los botones se envuelvan a otra línea */
 }
 
+@media (max-width: 768px) {
+    .sort-options {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .sort-options .btn {
+        flex: 1 1 calc(50% - 8px); /* Ocupa el 50% del ancho en pantallas pequeñas */
+    }
+}
+
 
 .disabled {
     background-color: #ccc;

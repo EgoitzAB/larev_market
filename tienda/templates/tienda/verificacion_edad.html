@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación de Edad</title>
+</head>
+<body>
+    <h1>Verificación de Edad</h1>
+    <p>Debes tener al menos 18 años para acceder a este sitio.</p>
+
+    <form method="POST" action="{% url 'tienda:confirmar_edad' %}">
+        {% csrf_token %}
+        <label>
+            <input type="checkbox" name="edad_confirmada" required>
+            Confirmo que tengo 18 años o más.
+        </label>
+        <button type="submit">Entrar</button>
+    </form>
+</body>
+</html>
