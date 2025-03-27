@@ -12,8 +12,7 @@ from .forms import CarritoAñadirProductoForm
 @require_POST
 def carrito_añadir(request):
     carrito = Carrito(request)
-    variante_id = request.POST['variante_id']
-
+    variante_id = request.POST.get('variante_id')  # Usa get() para evitar errores de clave
     if not variante_id:
         messages.error(request, "Debes seleccionar una variante antes de añadir al carrito.")
         return redirect('tienda:home')

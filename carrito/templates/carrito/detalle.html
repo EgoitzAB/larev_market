@@ -46,7 +46,7 @@
                     <p class="stock-error">No hay stock disponible</p>
                   {% else %}
                   <form action="{% url 'carrito:carrito_añadir' %}" method="post" class="quantity-form">
-                    <input type="hidden" name="variante_id" value="{{ item.variante.id }}">
+                    <input type="hidden" name="variante_id" value="{{ producto.id }}">
                     {{ item.FormActualizarProducto.cantidad }}
                     {{ item.FormActualizarProducto.sobreescribir }}
                     <button type="submit" class="update-button">Actualizar</button>
@@ -55,7 +55,7 @@
                   {% endif %}
                 </td>
                 <td class="cart-item-remove">
-                  <form action="{% url 'carrito:carrito_eliminar' item.variante.id %}" method="post" class="remove-form">
+                  <form action="{% url 'carrito:carrito_eliminar' producto.id %}" method="post" class="remove-form">
                     <button type="submit" class="remove-button">Eliminar</button>
                     {% csrf_token %}
                   </form>
