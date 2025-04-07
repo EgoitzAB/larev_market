@@ -16,3 +16,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+function toggleFiltros() {
+    var filtros = document.getElementById("filtrosOrdenacion");
+    filtros.style.display = (filtros.style.display === "none" || filtros.style.display === "") ? "block" : "none";
+}
