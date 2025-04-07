@@ -1,5 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
+from localflavor.es.es_provinces import PROVINCE_CHOICES
 from localflavor.es.forms import ESProvinceSelect
 from .models import Direccion
 from django.conf import settings
@@ -12,8 +13,7 @@ logger = logging.getLogger(__name__)
 
 class DireccionForm(forms.ModelForm):
     pais = CountryField().formfield()  # Campo de país con django-countries
-    provincia = forms.CharField(label=(u"provincia"), widget=ESProvinceSelect())  # Provincias de España
-    print(provincia)
+    provincia = forms.ChoiceField(choices=PROVINCE_CHOICES, widget=ESProvinceSelect())  # Provincias de España con selector    print(provincia)
 
     class Meta:
         model = Direccion

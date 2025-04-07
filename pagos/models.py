@@ -2,6 +2,10 @@ from django.db import models
 from django.conf import settings
 from tienda.models import ProductoVariante
 from checkout.models import Direccion
+from decimal import Decimal
+from django.core.validators import MinValueValidator, MaxValueValidator
+from coupon.models import Coupon
+
 
 class Orden(models.Model):
     ESTADO_CHOICES = (
@@ -18,31 +22,63 @@ class Orden(models.Model):
     total = models.DecimalField(max_digits=10, decimal_places=2)
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='pendiente')
 
+    coupon = models.ForeignKey(Coupon,
+                               related_name='ordenes',
+                               blank=True,
+                               null=True,
+                               on_delete=models.SET_NULL)
+    
+    descuento = models.IntegerField(default=0,
+                                    validators=[MinValueValidator(0),
+                                                MaxValueValidator(100)])
+
     def __str__(self):
         return f"Orden #{self.id} - {self.cliente.username}"
+    
+    def get_total_cost_before_discount(self):
+        """
+        Método para obtener el costo total de la orden antes de aplicar el descuento.
+        """
+        return sum(item.precio * item.cantidad for item in self.items.all())
+    
+    def get_discount(self):
+        total_cost = self.get_total_cost_before_discount()
+        if self.coupon and hasattr(self.coupon, 'discount'):
+            return (total_cost * self.coupon.discount) / 100
+        return Decimal(0)
+    
+    
+    def get_total_cost(self):
+        """
+        Método para obtener el costo total de la orden después de aplicar el descuento.
+        """
+        total_cost = self.get_total_cost_before_discount()
+        discount = self.get_discount()
+        return total_cost - discount
 
     @classmethod
-    def crear_orden(cls, cliente, direccion_envio, carrito):
+    def crear_orden(cls, cliente, direccion_envio, carrito, coupon=None):
         """
-        Método de clase para crear una orden con sus items, manejando correctamente las variantes de producto.
+        Crea una orden con sus items, aplicando un cupón si existe.
         """
-        # Calcula el total del carrito
-        total = carrito.carrito_total()
+        total = carrito.get_total_price_after_discount()  # Aplicar descuento
+        descuento = carrito.get_discount()  # Obtener el monto del descuento
 
-        # Crea la orden principal
+        # Crear la orden
         orden = cls.objects.create(
             cliente=cliente,
             direccion_envio=direccion_envio,
             total=total,
             estado='pendiente',
+            coupon=coupon,  # Asignar el cupón a la orden
+            descuento=descuento,  # Guardar el descuento aplicado
         )
 
-        # Agrega los items de la orden
+        # Agregar los items de la orden
         for item in carrito:
-            producto_variante = item['producto']  # Se espera que sea una instancia de ProductoVariante
             ItemOrden.objects.create(
                 orden=orden,
-                producto=producto_variante,
+                producto=item['producto'],
                 cantidad=item['cantidad'],
                 precio_unitario=item['precio'],
             )

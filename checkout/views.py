@@ -1,102 +1,79 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.utils.timezone import now
 from django.contrib import messages
 from .models import Direccion
-from pagos.models import Orden, ItemOrden
+from pagos.models import Orden
 from .forms import DireccionForm
 from carrito.carrito import Carrito
-from django.shortcuts import redirect
 from django.http import JsonResponse
-
-import logging
-
-
-logger = logging.getLogger(__name__)
 
 def checkout(request):
     carrito = Carrito(request)
     direcciones = None
+    cupon = carrito.coupon  # Recuperamos el cupón aplicado desde el carrito
+    descuento = 0  # Inicializamos el descuento
 
-    # Verificar si el carrito está vacío
     if not carrito:
-        messages.warning(request, "Tu carrito está vacío. Por favor, añade productos antes de proceder al checkout.")
-        logger.warning("El carrito está vacío.")
-        return redirect('tienda:home')  # Redirigir a la página de inicio
+        messages.warning(request, "Tu carrito está vacío. Añade productos antes de proceder al checkout.")
+        return redirect('tienda:home')
+
+    # Si hay un cupón aplicado, obtenemos el descuento
+    if cupon:
+        descuento = carrito.get_discount()  # Usamos el método que devuelve el descuento
 
     if request.user.is_authenticated:
-        # Solo buscar direcciones si el usuario está autenticado
         direcciones = Direccion.objects.filter(usuario=request.user)
-        logger.info(f"Direcciones encontradas: {direcciones.count()}")
 
-        # Limitar el número de direcciones a 5, pero permitir seleccionar una existente
         if direcciones.count() >= 5:
-            messages.warning(request, "Solo puedes tener un máximo de 5 direcciones guardadas. Selecciona una de las direcciones existentes para continuar.")
-            logger.warning("El usuario ya tiene 5 direcciones.")
-    
+            messages.warning(request, "Solo puedes guardar hasta 5 direcciones. Selecciona una existente.")
+
     if request.method == 'POST':
         if not request.user.is_authenticated:
-            # Redirigir al inicio de sesión si no está autenticado
-            logger.warning("El usuario no está autenticado.")
-            return redirect('account_login')  # Ajusta esta URL según tu configuración
+            return redirect('account_login')
 
         direccion_id = request.POST.get('direccion_id')
-        direccion = None
+        direccion = get_object_or_404(Direccion, id=direccion_id, usuario=request.user) if direccion_id else None
 
-        if direccion_id:
-            # Obtiene la dirección seleccionada por el usuario
-            direccion = get_object_or_404(Direccion, id=direccion_id, usuario=request.user)
-            logger.info(f"Dirección seleccionada: {direccion.id}")
-        else:
-            # Si no seleccionó una dirección existente, intenta crear una nueva
-            if direcciones.count() < 5:  # Permitir agregar solo si hay menos de 5 direcciones
-                direccion_form = DireccionForm(request.POST)
-                if direccion_form.is_valid():
-                    direccion = direccion_form.save(commit=False)
-                    direccion.usuario = request.user
-                    direccion.save()
-                    logger.info(f"Dirección nueva guardada: {direccion.id}")
-                else:
-                    # Devuelve el formulario con errores si no es válido
-                    logger.warning("El formulario de dirección no es válido.")
-                    return render(request, 'checkout/checkout.html', {
-                        'form': direccion_form,
-                        'carrito': carrito,
-                        'direcciones': direcciones,
-                    })
+        # Si no hay dirección seleccionada y el usuario tiene menos de 5 direcciones guardadas, crear una nueva
+        if not direccion and direcciones.count() < 5:
+            direccion_form = DireccionForm(request.POST)
+            if direccion_form.is_valid():
+                direccion = direccion_form.save(commit=False)
+                direccion.usuario = request.user
+                direccion.save()
             else:
-                # Si ya tiene 5 direcciones, solo permite la selección de una existente
-                messages.warning(request, "Ya tienes 5 direcciones guardadas. Selecciona una para continuar.")
-                logger.warning("El usuario tiene 5 direcciones, no se permite agregar una nueva.")
                 return render(request, 'checkout/checkout.html', {
-                    'carrito': carrito,
-                    'direcciones': direcciones,
+                    'form': direccion_form, 'carrito': carrito, 'direcciones': direcciones,
                 })
 
+        # Crear la orden
         try:
-            # Crear la orden
-            orden = Orden.crear_orden(cliente=request.user, direccion_envio=direccion, carrito=carrito)
-            logger.info(f"Orden creada con ID: {orden.id}")
+            orden = Orden.crear_orden(
+                cliente=request.user,
+                direccion_envio=direccion,
+                carrito=carrito,
+                coupon=cupon
+            )
 
-            # Limpiar el carrito
             carrito.limpiar()
-            # Redirigir al flujo de pago
+            carrito.remove_coupon()  # Eliminar el cupón de la sesión después de usarlo
             messages.success(request, "Orden creada correctamente. Procede al pago.")
             return redirect('pagos:realizar_compra', orden_id=orden.id)
         except Exception as e:
-            # Manejar errores durante la creación de la orden
             messages.error(request, f"Error al crear la orden: {str(e)}")
-            logger.error(f"Error al crear la orden: {str(e)}")
             return redirect('checkout')
 
-    else:
-        # Mostrar el formulario de dirección
-        direccion_form = DireccionForm()
+    # Recuperamos el total con el descuento aplicado
+    total_con_descuento = carrito.get_total_price_after_discount()  # Total con descuento
 
     return render(request, 'checkout/checkout.html', {
-        'form': direccion_form,
+        'form': DireccionForm(),
         'carrito': carrito,
         'direcciones': direcciones,
+        'cupon': cupon,
+        'descuento': descuento,
+        'total_con_descuento': total_con_descuento,  # Pasamos el total con descuento
     })
+
 
 def eliminar_direccion(request, direccion_id):
     if not request.user.is_authenticated:

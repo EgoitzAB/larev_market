@@ -64,15 +64,19 @@ class Carrito:
         self.carrito[producto_id]['cantidad'] = nueva_cantidad
         self.save()
 
-    def eliminar(self, producto):
+    def eliminar(self, producto, eliminar_todo=False):
         """
-        Eliminar un producto del carrito.
+        Eliminar una unidad de un producto o eliminarlo completamente del carrito.
         """
         producto_id = str(producto.id)
         if producto_id in self.carrito:
-            del self.carrito[producto_id]
+            if eliminar_todo or self.carrito[producto_id]['cantidad'] == 1:
+                del self.carrito[producto_id]  # Elimina todo el producto si se indica o si solo hay 1 unidad
+            else:
+                self.carrito[producto_id]['cantidad'] -= 1  # Reduce la cantidad en 1
+            
             self.save()
-
+            
     def limpiar(self):
         """
         Eliminar el carrito de la sesión.

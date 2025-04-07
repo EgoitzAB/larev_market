@@ -43,6 +43,13 @@ def carrito_eliminar(request, variante_id):
     
     return redirect('carrito:carrito_detalle')
 
+# Vista para eliminar completamente el producto
+@require_POST
+def carrito_eliminar_todo(request, variante_id):
+    carrito = Carrito(request)
+    producto = get_object_or_404(ProductoVariante, id=variante_id)
+    carrito.eliminar(producto, eliminar_todo=True)
+    return redirect('carrito:carrito_detalle')
 
 def carrito_detalle(request):
     carrito = Carrito(request)

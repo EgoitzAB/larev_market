@@ -8,7 +8,10 @@
     <!-- Style -->
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />    
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.css" />
     {% block extrahead %}
 
     {% endblock extrahead %}
@@ -17,8 +20,8 @@
   </head>
   <body class="{% block body_class %} {% endblock body_class %}">
     <script>
-      const bannerText = 'This website contains explicit content. Are you over 18?';
-      const confirmationButtonText = 'Yes';
+      const bannerText = 'Esta web contiene contenido explícito. ¿Tienes más de 18 años?';
+      const confirmationButtonText = 'Sí';
       const declineButtonText = 'No';
       const mainDiv = document.createElement('div');
       const divForButtons = document.createElement('div');
@@ -52,7 +55,7 @@
           localStorage.setItem('overAge', overAge);
       })
       randomUnder.addEventListener('click', function () {
-          window.location = 'https://google.com';
+          window.location = 'https://duckduckgo.com';
       })
   </script>
   <style>
@@ -164,7 +167,27 @@
     {% block footer %}
     {% endblock footer %}
     {% include 'page/footer.html' %}
-    {% block javascript %}{% endblock javascript %}
+    {% block javascript %}
+    <script src="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.js"></script>
+    <script>
+      window.addEventListener("load", function(){
+        window.cookieconsent.initialise({
+          palette: {
+            popup: { background: "#000" },
+            button: { background: "#f1d600" }
+          },
+          theme: "classic",
+          position: "bottom-right",
+          content: {
+            message: "Este sitio usa cookies para mejorar tu experiencia.",
+            dismiss: "Aceptar",
+            link: "Más información",
+            href: "/politica-cookies/"
+          }
+        });
+      });
+    </script>
+    {% endblock javascript %}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="{% static 'js/main.js' %}" defer></script>
   </body>

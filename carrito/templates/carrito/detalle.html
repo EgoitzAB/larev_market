@@ -16,101 +16,75 @@
     </div>
 {% endfor %}
 
-
-  <div class="cart-container">
-    <h1 class="cart-title">Tu carrito de compras</h1>
-    <div class="cart-table-container">
-      <table class="cart-table">
-        <thead>
-          <tr>
-            <th>Imagen</th>
-            <th>Producto</th>
-            <th>Cantidad</th>
-            <th>Eliminar</th>
-            <th>Precio unitario</th>
-            <th>Precio total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for item in carrito %}
-            {% with producto=item.producto %}
-              <tr class="cart-item">
-                <td class="cart-item-image">
-                  <a href="{{ producto.get_absolute_url }}">
-                    <img src="{% if producto.get_imagen1 %}{{ producto.get_imagen1.url }}{% else %}{% static 'img/no_image.png' %}{% endif %}" alt="{{ producto.nombre }}">
-                  </a>
-                </td>
-                <td class="cart-item-name">{{ producto.nombre }}</td>
-                <td class="cart-item-quantity">
-                  {% if item.variante and item.variante.stock <= 0 %}
-                    <p class="stock-error">No hay stock disponible</p>
-                  {% else %}
-                  <form action="{% url 'carrito:carrito_añadir' %}" method="post" class="quantity-form">
-                    <input type="hidden" name="variante_id" value="{{ producto.id }}">
-                    {{ item.FormActualizarProducto.cantidad }}
-                    {{ item.FormActualizarProducto.sobreescribir }}
-                    <button type="submit" class="update-button">Actualizar</button>
-                    {% csrf_token %}
-                  </form>
-                  {% endif %}
-                </td>
-                <td class="cart-item-remove">
-                  <form action="{% url 'carrito:carrito_eliminar' producto.id %}" method="post" class="remove-form">
-                    <button type="submit" class="remove-button">Eliminar</button>
-                    {% csrf_token %}
-                  </form>
-                </td>
-                <td class="cart-item-price">${{ item.precio }}</td>
-                <td class="cart-item-total">${{ item.precio_total }}</td>
-              </tr>
-            {% endwith %}
-          {% endfor %}
-          {% if carrito.coupon %}
-            <tr class="subtotal">
-              <td colspan="5" class="subtotal-label">Subtotal</td>
-              <td class="subtotal-price">${{ carrito.carrito_total|floatformat:2 }}</td>
-            </tr>
-            <tr class="coupon">
-              <td colspan="5" class="coupon-label">Cupón "{{ carrito.coupon.code }}"</td>
-              <td class="coupon-price">- ${{ carrito.get_discount|floatformat:2 }}</td>
-            <td class="num neg">
-              - €{{ carrito.get_discount|floatformat:2 }}
-            </td>
-            </tr>
-          {% endif %}
-          <tr class="cart-total">
-            <td colspan="5" class="total-label">Total</td>
-            <td class="total-price">${{ carrito.get_total_price_after_discount|floatformat:2 }}</td>
-          </tr>
-        </tbody>
-      </table>
-      <p>Aplicar un cupón:</p>
-      <form action="{% url 'coupon:apply' %}" method="post" class="coupon-form">
-        {% csrf_token %}
-        {{ coupon_apply_form.as_p }}
-        <input type="submit" value="Aplicar" class="apply-button" placeholder="Ingresa tu cupón">
-      </form>
-    </div>
-
-    {% if productos_recomendados %}
-      <div class="recommendations">
-        <h3 class="recommendations-title">Productos recomendados</h3>
-        <div class="recommendations-grid">
-          {% for p in productos_recomendados %}
-            <div class="recommendation-item">
-              <a href="{{ p.get_absolute_url }}">
-                <img src="{% if p.imagen %}{{ p.imagen.url }}{% else %}{% static 'img/no_image.png' %}{% endif %}" alt="{{ p.nombre }}">
-              </a>
-              <p class="recommendation-name"><a href="{{ p.get_absolute_url }}">{{ p.nombre }}</a></p>
+<div class="cart-container">
+  <h1 class="cart-title">Tu carrito de compras</h1>
+  <div class="cart-items">
+    {% for item in carrito %}
+      {% with producto=item.producto %}
+        <div class="cart-item">
+          <div class="cart-item-left">
+            <a href="{{ producto.get_absolute_url }}">
+              <img src="{% if producto.get_imagen1 %}{{ producto.get_imagen1.url }}{% else %}{% static 'img/no_image.png' %}{% endif %}" alt="{{ producto.nombre }}">
+            </a>
+            <p class="cart-item-name">{{ producto.nombre }}</p>
+          </div>
+          <div class="cart-item-right">
+            <div class="cart-price-block">
+              <p class="cart-item-price">Precio unitario: {{ item.precio }}€</p>
+              <p class="cart-item-total">Total: {{ item.precio_total }}€</p>
             </div>
-          {% endfor %}
+            <div class="cart-quantity-block">
+              <p class="cart-current-quantity">Cantidad: {{ item.cantidad }}</p>
+              <form action="{% url 'carrito:carrito_añadir' %}" method="post" class="quantity-form">
+                <div class="quantity-container">
+                  <input type="hidden" name="variante_id" value="{{ producto.id }}">
+                  {{ item.FormActualizarProducto.cantidad }}
+                  {{ item.FormActualizarProducto.sobreescribir }}
+                  <button type="submit" class="update-button">&#x21bb;</button>
+                  {% csrf_token %}
+                </div>
+              </form>
+            </div>
+            <div class="cart-remove-block">
+              <form action="{% url 'carrito:carrito_eliminar' producto.id %}" method="post" class="remove-form">
+                <div class="quantity-container">
+                  <button type="submit" class="remove-button">Eliminar uno</button>
+                  {% csrf_token %}
+                </div>
+              </form>
+              <form action="{% url 'carrito:carrito_eliminar_todo' producto.id %}" method="post" class="remove-all-form">
+                <div class="quantity-container">
+                  <button type="submit" class="remove-all-button">Eliminar todo</button>
+                  {% csrf_token %}
+                </div>
+              </form>
+            </div>
+            {% if item.variante and item.variante.stock <= 0 %}
+              <p class="stock-error">No hay stock disponible</p>
+            {% endif %}
+          </div>
         </div>
-      </div>
-    {% endif %}
-
-    <div class="cart-actions">
-      <a href="{% url 'tienda:listado_producto' %}" class="continue-shopping">Seguir comprando</a>
-      <a href="{% url 'checkout:crear_orden' %}" class="checkout-button">Finalizar compra</a>
-    </div>
+      {% endwith %}
+    {% endfor %}
   </div>
+  <!-- Cart summary -->
+  <div class="cart-summary">
+    <p>Subtotal: ${{ carrito.carrito_total|floatformat:2 }}</p>
+    {% if carrito.coupon %}
+      <p>Cupón "{{ carrito.coupon.code }}": - ${{ carrito.get_discount|floatformat:2 }}</p>
+    {% endif %}
+    <p class="cart-total">Total: ${{ carrito.get_total_price_after_discount|floatformat:2 }}</p>
+    <form action="{% url 'coupon:apply' %}" method="post" class="coupon-form">
+      {% csrf_token %}
+      {{ coupon_apply_form.as_p }}
+      <input type="submit" value="Aplicar" class="apply-button">
+    </form>
+  </div>
+  <!-- Cart actions -->
+  <div class="cart-actions">
+    <a href="{% url 'tienda:listado_producto' %}" class="continue-shopping">Seguir comprando</a>
+    <a href="{% url 'checkout:crear_orden' %}" class="checkout-button">Finalizar compra</a>
+  </div>
+</div>
+
 {% endblock %}

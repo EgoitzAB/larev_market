@@ -22,7 +22,7 @@
 
 <div class="checkout-container">
     <h1>Checkout</h1>
-
+    
     <!-- Formulario para seleccionar una dirección existente -->
     <form method="post" class="mb-4">
         {% csrf_token %}
@@ -90,10 +90,23 @@
             </tbody>
         </table>
     </div>
+<!-- Mostrar el cupón aplicado, si existe -->
+{% if cupon %}
+    <div class="alert alert-info">
+        Cupón aplicado: <strong>{{ cupon.code }}</strong> - Descuento: {{ descuento }} €
+    </div>
+{% endif %}
 
-    <h3 class="mt-4">Total: <span class="text-success">{{ carrito.carrito_total }} €</span></h3>
+<!-- Mostrar el total con descuento -->
+<div class="total-section">
+    <p class="subtotal">Subtotal: <span>{{ carrito.carrito_total }} €</span></p>
+
+    {% if cupon %}
+        <p class="discount">Descuento aplicado: <span>- {{ descuento }} €</span></p>
+    {% endif %}
+
+    <h3 class="mt-4 total">Total: <span class="text-success">{{ carrito.get_total_price_after_discount|floatformat:2 }} €</span></h3>
 </div>
-
 {% endblock content %}
 
 {% block javascript %}
