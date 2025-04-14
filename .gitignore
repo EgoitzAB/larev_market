@@ -14,7 +14,7 @@ __pycache__/
 
 # Archivos de configuraciones locales
 settings_local.py
-
+settings.py
 # Archivos generados estáticos y de medios
 media/
 *.log

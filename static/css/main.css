@@ -1,0 +1,9 @@
+.btn-verde-claro {
+    color: #a8ffb3 !important; /* Verde clarito */
+    border-color: #a8ffb3 !important;
+}
+
+.btn-verde-claro:hover {
+    background-color: #a8ffb3 !important;
+    color: #000 !important;
+}

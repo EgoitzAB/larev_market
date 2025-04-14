@@ -6,38 +6,40 @@
 {% endblock navbar %}
 
 {% block content %}
-<div class="container my-5">
-    <h1 class="text-success mb-4">Productos</h1>
+<div class="container my-5 mt-5">
+    <h1 class="text-white text-center mb-4 mt-5">Productos</h1>
 
     <!-- Filtros de Categorías y Subcategorías -->
-    <div class="row">
+    <div class="row bg-dark">
+    {% if subcategorias %}
         <!-- Subcategorías a la izquierda -->
-        <div class="col-md-3">
-            <h3 class="text-success mb-3">Subcategorías</h3>
+        <div class="col-md-3 bg-dark mb-4">
+            <h3 class="text-white mb-3 mt-3">Subcategorías</h3>
             <ul class="list-group">
                 {% for subcat in subcategorias %}
-                <li class="list-group-item">
-                    <a href="{% url 'tienda:listado_subcategoria' categoria.slug subcat.slug %}">
-                        {{ subcat.nombre }}
+                <li class="list-group-item bg-dark">
+                    <a href="{% url 'tienda:listado_subcategoria' categoria.slug subcat.slug %}"
+                       class="btn sort-btn bg-dark">
+                        {{ subcat.nombre|title }}
                     </a>
                 </li>
                 {% endfor %}
             </ul>
         </div>
-
+    {% endif %}
         <!-- Productos a la derecha -->
-        <div class="col-md-9">
-            <h2 class="text-success mb-4">Productos</h2>
+        <div class="col-md-12">
+            <h2 class="text-white mb-4">Productos</h2>
             <div class="product-grid">
                 {% for producto in productos %}
-                <div class="product-card">
+                <div class="product-card variant-card">
                     <a href="{% url 'tienda:detalle_producto' producto.slug %}">
                         {% if producto.imagen1 %}
                         <img src="{{ producto.imagen1.url }}" alt="{{ producto.nombre }}" class="product-image">
                         {% else %}
                         <img src="{% static 'images/no-image-available.png' %}" alt="Imagen no disponible" class="product-image">
                         {% endif %}
-                        <h3 class="text-success mt-3">{{ producto.nombre }}</h3>
+                        <h3 class="text-white mt-3">{{ producto.nombre }}</h3>
                     </a>
                 </div>
                 {% endfor %}

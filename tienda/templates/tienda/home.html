@@ -12,29 +12,28 @@ Tienda de productos de CBD, página principal
 {% endblock navbar %}
     
 {% block content %}
-<!-- Modal para verificación de edad -->
-<!-- {% if not request.session.edad_verificada %}
-<div class="overlay" id="modal-verificacion">
-    <div class="custom-modal">
-        <img src="{% static 'favicon.png' %}" alt="Verificación de Edad">
-        <h1>Verificación de Edad</h1>
-        <p>Debes tener al menos 18 años para acceder a este sitio web.</p>
-        <label>
-            <input type="checkbox" id="confirmar-edad" required>
-            Confirmo que tengo 18 años o más
-        </label>
-        <button onclick="verificarEdad()">Entrar</button>
-    </div>
-</div>
-{% endif %} -->
 
-<!-- Contenedor con margen -->
-<div class="container my-4">
+<section class="parallax-section" style="background-image: url('{% static "img/marimonte.jpg" %}');">
+    <div class="parallax-content text-center text-white">
+      <h2>La Revolución verde</h2>
+      <h3>Bienestar natural</h3>
+      <p>Productos de CBD de máxima calidad</p>
+    </div>
+  </section>
+<!-- Título principal centrado -->
+<h1 class="text-center my-4">Nuestros Productos</h1>
+
+<!-- Subtítulo que muestra/oculta los filtros y ordenación -->
+<h6 class="text-white text-start ms-3" style="cursor: pointer;" onclick="toggleFiltros()">
+    Filtros y Ordenación <span id="flecha">▼</span>
+</h6>
+
+<!-- Contenedor con margen, inicialmente oculto -->
+<div class="container my-4" id="filtrosOrdenacion" style="display: none;">
     <!-- Contenedor para ordenación y botones de categoría -->
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
         <!-- Ordenación -->
         <div class="sort-options d-flex align-items-center gap-3">
-            <!-- Convertimos el select a botones de ordenación -->
             <button class="btn sort-btn" data-sort="precio_asc" onclick="ordenarProductos('precio_asc')">Precio: Menor a mayor</button>
             <button class="btn sort-btn" data-sort="precio_desc" onclick="ordenarProductos('precio_desc')">Precio: Mayor a menor</button>
             <button class="btn sort-btn" data-sort="nombre_asc" onclick="ordenarProductos('nombre_asc')">Nombre: A a Z</button>
@@ -45,9 +44,7 @@ Tienda de productos de CBD, página principal
 
         <!-- Botones de categorías -->
         <div class="category-buttons my-3 d-flex gap-3">
-            <button class="btn category-btn" data-category="all">
-                Todo
-            </button>
+            <button class="btn category-btn" data-category="all">Todo</button>
             {% for categoria, productos in productos_por_categoria_json.items %}
                 {% if productos %}  <!-- Solo renderiza si hay productos en la categoría -->
                 <button class="btn category-btn" data-category="{{ categoria|slugify }}">
@@ -63,10 +60,10 @@ Tienda de productos de CBD, página principal
     {% for categoria, productos in productos_por_categoria_json.items %}
         {% if productos %}
         <div id="{{ categoria|slugify }}" class="category-section">
-            <h2 class="text-success text-center my-4 py-2 border-bottom">{{ categoria|title }}</h2>            
+            <h2 class="text-white text-center my-4 py-2 border-bottom">{{ categoria|title }}</h2>            
             <div class="product-grid">
                 {% for producto in productos %}
-                <div class="product-card {% if forloop.counter > 9 %}d-none{% endif %}" data-pagina="1">
+                <div class="product-card {% if forloop.counter > 12 %}d-none{% endif %}" data-pagina="1">
                     {% if producto.imagen1 %}
                     <a href="{% url 'tienda:detalle_producto' producto.slug %}" class="product-image">
                         <img src="{{ producto.imagen1 }}" alt="{{ producto.nombre }}" class="primary-image">
@@ -83,7 +80,7 @@ Tienda de productos de CBD, página principal
                     <form method="post" action="{% url 'carrito:carrito_añadir' %}">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-dark border-light text-light">Comprar</button>                    
-                        <h3>{{ producto.nombre }}</h3>
+                        <h3 class="mt-3 text-white display-8 text-uppercase">{{ producto.nombre }}</h3>
                         <div id="info-variante" class="mb-2">
                             <p><strong>Precio:</strong> <span id="precio-seleccionado">€{{ producto.variantes.0.precio }}</span></p>
                             <p><strong>Peso:</strong> <span id="peso-seleccionado">{{ producto.variantes.0.peso }}g</span></p>
@@ -107,17 +104,30 @@ Tienda de productos de CBD, página principal
                 </div>
                 {% endfor %}
             </div>
-            {% if productos|length > 9 %}
+            {% if productos|length > 12 %}
             <div class="text-center my-4">
-                <button class="btn btn-success ver-mas-btn" data-categoria="{{ categoria|slugify }}" data-pagina="1">Ver más</button>
-                <button class="btn btn-outline-success ver-menos-btn d-none" data-categoria="{{ categoria|slugify }}" data-pagina="1">Ver menos</button>
+                <div class="text-center my-4">
+                    <button class="btn btn-dark text-white ver-mas-btn" data-categoria="{{ categoria|slugify }}" onclick="toggleVerMas(this)">
+                        + productos
+                    </button>
+                </div>
+                <div class="text-center my-4">
+                    <button class="btn btn-dark text-white ver-menos-btn d-none" data-categoria="{{ categoria|slugify }}" onclick="toggleVerMas(this)">
+                        - productos
+                    </button>
+                </div>
             </div>
             {% endif %}
         </div>
         {% endif %}
     {% endfor %}
 </section>
-
+<section class="parallax-section" style="background-image: url('{% static "img/marimonte.jpg" %}');">
+    <div class="parallax-content text-center text-white">
+      <h2>La Revolución verde, Bienestar natural</h2>
+      <p>Productos de CBD de máxima calidad</p>
+    </div>
+  </section>
 
 <!-- Exponer los datos como JSON para manipular con JS -->
 

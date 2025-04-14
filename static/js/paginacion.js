@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const productosOcultos = Array.from(productGrid.querySelectorAll('.product-card.d-none'));
 
         // Mostrar solo los siguientes 9 productos ocultos
-        const productosAMostrar = productosOcultos.slice(0, 9);
+        const productosAMostrar = productosOcultos.slice(0, 12);
         productosAMostrar.forEach(producto => {
             producto.classList.remove('d-none');
         });
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
             verMenosButton.classList.remove('d-none');
 
             // Ocultar el botón "Ver más" si no hay más productos para mostrar
-            const productosRestantes = productosOcultos.slice(9).length;
+            const productosRestantes = productosOcultos.slice(12).length;
             if (productosRestantes === 0) {
                 verMasButton.style.display = 'none';
             }
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const productosVisibles = Array.from(productGrid.querySelectorAll('.product-card:not(.d-none)'));
 
         // Ocultar los últimos 9 productos visibles
-        const productosAOcultar = productosVisibles.slice(-9);
+        const productosAOcultar = productosVisibles.slice(-12);
         productosAOcultar.forEach(producto => {
             producto.classList.add('d-none');
         });

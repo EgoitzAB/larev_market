@@ -3,31 +3,10 @@
 {% load custom_filters %}
 <div class="container-fluid fixed-top">
     <!-- Top bar (opcional, lo mantenemos igual) -->
-    <div class="container-fluid topbar bg-warning d-none d-lg-block">
-        <div class="d-flex justify-content-between">
-            <div class="top-info ps-2">
-                <small class="me-3">
-                    <i class="fas fa-map-marker-alt me-2 text-secondary"></i>
-                    <a href="{% url 'core:tienda_info' %}" class="text-white">Calle San Francisco, San Sebastián</a>
-                </small>
-                <small class="me-3">
-                    <i class="fas fa-envelope me-2 text-secondary"></i>
-                    <a href="mailto:tuemail@example.com?subject=Consulta&body=Hola,%20tengo%20una%20consulta."
-                       class="text-white">
-                       Email@Example.com
-                    </a>
-                </small>
-            </div>
-            <div class="top-link pe-2">
-                <a href="{% url 'core:politica_de_privacidad' %}" class="text-white">
-                    <small class="text-white mx-2">Política de privacidad</small>/
-                </a>
-                <a href="{% url 'core:terminos_de_uso' %}" class="text-white">
-                    <small class="text-white mx-2">Términos de uso</small>/
-                </a>
-                <a href="#" class="text-white">
-                    <small class="text-white ms-2">Ventas y devoluciones</small>
-                </a>
+    <div class="container-fluid topbar d-none d-lg-block">
+        <div class="d-flex justify-content-center text-dark">
+            <div class="top-info ps-2 flex-start">
+            <h4 class="justify-content-center">Envíos gratis a partir de 50€</h4>    
             </div>
         </div>
     </div>
@@ -53,8 +32,8 @@
                     {% for categoria, productos in productos_por_categoria_json.items %}
                     {% if productos %}  <!-- Solo renderiza si hay productos en la categoría -->
                     <div class="nav-item dropdown">
-                        <a href="{% url 'tienda:listado_producto' %}?categoria={{ categoria|urlencode }}" 
-                           class="nav-link dropdown-toggle" 
+                        <a href="{% url 'tienda:listado_categoria' categoria_slug=categoria|slugify %}"
+                        class="nav-link dropdown-toggle" 
                            id="dropdownMenu{{ forloop.counter }}" 
                            data-bs-toggle="dropdown" 
                            aria-expanded="false">
@@ -69,8 +48,10 @@
                                     <ul class="list-unstyled">
                                         {% for subcategoria in subcategorias %}
                                             <li>
-                                                <a class="dropdown-item" href="{% url 'tienda:listado_producto' %}?categoria={{ categoria|urlencode }}&subcategoria={{ subcategoria.slug }}">
-                                                    {{ subcategoria.nombre|title }}
+                                                <a 
+                                                class="dropdown-item" 
+                                                href="{% url 'tienda:listado_subcategoria' categoria|slugify subcategoria.slug %}">
+                                                {{ subcategoria.nombre|title }}
                                                 </a>
                                             </li>
                                         {% endfor %}

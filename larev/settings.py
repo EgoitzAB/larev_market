@@ -26,12 +26,12 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-7y14cf!h6-9l3ulf8mv=dq@6i=llj%$3+tud_ij(@)0gl-kbb%')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = os.getenv('DEBUG') == 'True'
-DEBUG = False
+DEBUG = os.getenv('DEBUG') == 'True'
+# DEBUG = False
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'larevolucionverde.es').split(',')
 
-ALLOWED_HOSTS.append(os.getenv('SITE_URL'))
+# ALLOWED_HOSTS.append(os.getenv('SITE_URL'))
 # Application definition
 
 INSTALLED_APPS = [
@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'whitenoise',
     'defender',
     'redisboard',
+    'localflavor',
 
     'allauth',
     'allauth.account',
@@ -60,6 +61,7 @@ INSTALLED_APPS = [
     'carrito',
     'pagos',
     'checkout',
+    'coupon',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -84,7 +86,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
 #    "core.middleware.EmailM,FAMiddleware", # email 2fa middlware
-    'tienda.middleware.VerificacionEdadMiddleware',
     'allauth.account.middleware.AccountMiddleware',
 ]
 
@@ -239,16 +240,16 @@ LOGGING = {
     },
 }
 
-SECURE_HSTS_SECONDS = 31536000  # 1 año
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = 'DENY'
-SECURE_SSL_REDIRECT = True
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_SSL_HOST = True
-SECURE_REFERRER_POLICY = 'same-origin'
+# SECURE_HSTS_SECONDS = 31536000  # 1 año
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+# SECURE_HSTS_PRELOAD = True
+# SECURE_SSL_REDIRECT = True
+# SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True
+# SECURE_BROWSER_XSS_FILTER = True
+# SECURE_CONTENT_TYPE_NOSNIFF = True
+# X_FRAME_OPTIONS = 'DENY'
+# SECURE_SSL_REDIRECT = True
+# SECURE_BROWSER_XSS_FILTER = True
+# SECURE_SSL_HOST = True
+# SECURE_REFERRER_POLICY = 'same-origin'

@@ -10,14 +10,9 @@
 {% endblock navbar %}
 
 {% block content %}
-{% for message in messages %}
-    <div class="alert alert-{{ message.tags }}">
-        {{ message }}
-    </div>
-{% endfor %}
 
 <div class="cart-container">
-  <h1 class="cart-title">Tu carrito de compras</h1>
+  <h1 class="cart-title mt-5">Tu carrito de compras</h1>
   <div class="cart-items">
     {% for item in carrito %}
       {% with producto=item.producto %}
