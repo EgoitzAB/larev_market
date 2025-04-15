@@ -240,6 +240,18 @@ LOGGING = {
     },
 }
 
+TIENDA_DIRECCION = {
+    "nombre": "Tienda",
+    "apellido": "Central",
+    "direccion": "Calle Falsa 123",
+    "ciudad": "Ciudad Ejemplo",
+    "codigo_postal": "12345",
+    "provincia": "Provincia Ejemplo",
+    "pais": "ES",  # Código de país ISO (django-countries lo interpretará)
+    "email": "tienda@ejemplo.com",
+    "telefono": "600111222",
+}
+
 # SECURE_HSTS_SECONDS = 31536000  # 1 año
 # SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 # SECURE_HSTS_PRELOAD = True

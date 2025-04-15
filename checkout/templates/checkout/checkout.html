@@ -4,16 +4,19 @@
 {% block body_class %}
     bg-dark text-white
 {% endblock body_class %}
-    
+
 {% block navbar %}
-{% include 'page/navbar.html' %}
+    {% include 'page/navbar.html' %}
 {% endblock navbar %}
+
 {% block content %}
 <div class="checkout-container container">
     <h1 class="mb-4">Checkout</h1>
-    <form method="post" id="checkout-form">
+    <!-- Incluimos novalidate para desactivar la validación nativa -->
+    <form method="post" id="checkout-form" novalidate>
         {% csrf_token %}
         <div class="row">
+            <!-- Sección de Dirección -->
             <div class="col-lg-6 mb-4" id="direccion-col">
                 <h2 class="text-success mb-3">Datos de Envío</h2>
                 <div id="envio-section">
@@ -53,15 +56,19 @@
                         </div>
                     </div>
                 </div>
+                <!-- Sección de Recogida en Tienda -->
                 <div id="recogida-section" style="display: none;">
                     <h5 class="text-light">Nombre del Cliente:</h5>
-                    <input type="text" name="nombre_cliente_recogida" class="form-control" placeholder="Tu nombre" required>
+                    <!-- Prepopula el campo con el nombre del usuario -->
+                    <input type="text" name="nombre_cliente_recogida" class="form-control" placeholder="Tu nombre"
+                           value="{{ request.user.get_full_name }}" required>
                     <div class="alert alert-warning mt-3" role="alert">
                         <strong>Importante:</strong> El pedido se reservará durante <strong>48 horas</strong> desde la confirmación. Después de ese plazo, los productos podrían volver a estar disponibles para otros clientes.
                     </div>
                     <small class="text-muted">La dirección será la de nuestra tienda.</small>
                 </div>
             </div>
+            <!-- Sección de Métodos de Entrega y Pago -->
             <div class="col-lg-6 mb-4">
                 <h2 class="text-success mb-3">Método de Entrega</h2>
                 <div class="form-check mb-2">
@@ -86,6 +93,7 @@
         </div>
     </form>
     <hr class="my-4">
+    <!-- Resumen del Carrito -->
     <h2 class="text-success mb-3">Resumen del Carrito</h2>
     <div class="table-responsive">
         <table class="table table-bordered text-white">
@@ -99,34 +107,35 @@
             </thead>
             <tbody>
                 {% for item in carrito %}
-                <tr>
-                    <td>{{ item.producto.nombre }}</td>
-                    <td>{{ item.cantidad }}</td>
-                    <td>{{ item.precio }} €</td>
-                    <td>{{ item.precio_total }} €</td>
-                </tr>
+                    <tr>
+                        <td>{{ item.producto.nombre }}</td>
+                        <td>{{ item.cantidad }}</td>
+                        <td>{{ item.precio }} €</td>
+                        <td>{{ item.precio_total }} €</td>
+                    </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
     {% if cupon %}
-    <div class="alert alert-info mt-3">
-        Cupón aplicado: <strong>{{ cupon.code }}</strong> - Descuento: {{ descuento }} €
-    </div>
+        <div class="alert alert-info mt-3">
+            Cupón aplicado: <strong>{{ cupon.code }}</strong> - Descuento: {{ descuento }} €
+        </div>
     {% endif %}
     <div class="total-section mt-4">
         <p class="subtotal">Subtotal: <span>{{ carrito.carrito_total }} €</span></p>
         {% if cupon %}
-        <p class="discount">Descuento: <span>- {{ descuento }} €</span></p>
+            <p class="discount">Descuento: <span>- {{ descuento }} €</span></p>
         {% endif %}
         <h3 class="total mt-3">Total: <span class="text-success">{{ carrito.get_total_price_after_discount|floatformat:2 }} €</span></h3>
     </div>
 </div>
 {% endblock content %}
+
 {% block javascript %}
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // Métodos de entrega
+        // Elementos de métodos de entrega y pago
         const metodoEnvio = document.getElementById('envio');
         const metodoRecogida = document.getElementById('recogida');
         const envioSection = document.getElementById('envio-section');
@@ -135,46 +144,76 @@
         const efectivoRadio = document.getElementById('efectivo');
         const tarjetaRadio = document.getElementById('tarjeta');
 
-        // Dirección
+        // Elementos de la sección de dirección
         const direccionExistenteRadio = document.getElementById("direccion-existente-radio");
         const nuevaDireccionRadio = document.getElementById("nueva-direccion-radio");
         const listaDirecciones = document.getElementById("lista-direcciones");
         const nuevaDireccionForm = document.getElementById("nueva-direccion-form");
+        const inputsNuevaDireccion = nuevaDireccionForm.querySelectorAll("input, select, textarea");
 
+        // Función que actualiza la sección de entrega y método de pago
         function actualizarEntregaYFormaPago() {
             if (metodoRecogida.checked) {
                 envioSection.style.display = "none";
                 recogidaSection.style.display = "block";
                 efectivoOption.style.display = "block";
+
+                // Deshabilitar inputs de la nueva dirección para evitar validación
+                inputsNuevaDireccion.forEach(input => input.disabled = true);
             } else {
                 envioSection.style.display = "block";
                 recogidaSection.style.display = "none";
                 efectivoOption.style.display = "none";
                 tarjetaRadio.checked = true;
+
+                // Habilitar los inputs si se ha elegido nueva dirección
+                if (nuevaDireccionRadio.checked) {
+                    inputsNuevaDireccion.forEach(input => input.disabled = false);
+                }
             }
         }
 
+        // Función que actualiza la visualización de la sección de dirección
         function actualizarDireccion() {
             if (direccionExistenteRadio.checked) {
                 listaDirecciones.style.display = "block";
                 nuevaDireccionForm.style.display = "none";
+                // Asegurarse de que los inputs de nueva dirección estén deshabilitados
+                inputsNuevaDireccion.forEach(input => {
+                    input.disabled = true;
+                    input.removeAttribute("required"); // Quitar validación si fuera necesario
+                });
             } else if (nuevaDireccionRadio.checked) {
                 listaDirecciones.style.display = "none";
                 nuevaDireccionForm.style.display = "block";
+                // Habilitar inputs y agregar atributo requerido nuevamente
+                inputsNuevaDireccion.forEach(input => {
+                    input.disabled = false;
+                    input.setAttribute("required", "required");
+                });
             }
         }
 
-        // Listeners
+        // Listener para submit: forzamos la desactivación de campos innecesarios justo antes de enviar el formulario.
+        document.getElementById('checkout-form').addEventListener('submit', function(e) {
+            // Si se seleccionó recogida en tienda, deshabilitar todos los inputs de la sección de nueva dirección.
+            if (metodoRecogida.checked) {
+                inputsNuevaDireccion.forEach(input => {
+                    input.disabled = true;
+                    input.removeAttribute("required");
+                });
+            }
+        });
+
+        // Asignar eventos a cambios de selección
         metodoEnvio.addEventListener("change", actualizarEntregaYFormaPago);
         metodoRecogida.addEventListener("change", actualizarEntregaYFormaPago);
-
         direccionExistenteRadio.addEventListener("change", actualizarDireccion);
         nuevaDireccionRadio.addEventListener("change", actualizarDireccion);
 
-        // Ejecutar al cargar
+        // Ejecutar las funciones al cargar la página
         actualizarEntregaYFormaPago();
         actualizarDireccion();
     });
 </script>
 {% endblock javascript %}
-

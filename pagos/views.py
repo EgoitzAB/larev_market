@@ -177,3 +177,27 @@ def liberar_stock(orden):
         for item in orden.items.all():
             item.producto.stock += item.cantidad
             item.producto.save()
+
+@login_required
+def confirmacion_recogida(request, orden_id):
+    """
+    Vista de confirmación para pedidos de recogida en tienda.
+    Marca la orden como completada y muestra la confirmación sin pasar por el proceso de PayGreen.
+    """
+    try:
+        orden = Orden.objects.get(id=orden_id, cliente=request.user)
+    except Orden.DoesNotExist:
+        messages.error(request, "Orden no encontrada.")
+        return redirect('compra:carrito')
+
+    # Actualizar el estado de la orden a "completada"
+    orden.estado = "completada"
+    orden.save()
+
+    # Si la orden posee un registro de pago, se actualiza el estado
+    if hasattr(orden, 'pago'):
+        orden.pago.estado = "exitoso"
+        orden.pago.save()
+
+    messages.success(request, "Orden confirmada. Recoge tu pedido en tienda y paga en efectivo al recogerlo.")
+    return render(request, 'pagos/confirmacion_recogida.html', {'orden': orden})

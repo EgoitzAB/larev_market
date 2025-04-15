@@ -1,0 +1,17 @@
+{% extends "page/base.html" %}
+{% load static %}
+
+{% block body_class %}bg-light{% endblock body_class %}
+
+{% block navbar %}
+  {% include 'page/navbar.html' %}
+{% endblock navbar %}
+
+{% block content %}
+<div class="container my-5">
+  <h1 class="mb-4">¡Compra Confirmada!</h1>
+  <p>Tu orden <strong>#{{ orden.id }}</strong> ha sido registrada para recogida en tienda y podrás pagar en efectivo cuando la recojas.</p>
+  <p>Te esperamos en la tienda: <strong>{{ orden.direccion_envio.direccion }}, {{ orden.direccion_envio.ciudad }}</strong></p>
+  <a href="{% url 'tienda:home' %}" class="btn btn-primary mt-3">Volver a la tienda</a>
+</div>
+{% endblock content %}
