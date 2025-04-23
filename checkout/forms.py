@@ -4,7 +4,6 @@ from localflavor.es.es_provinces import PROVINCE_CHOICES
 from localflavor.es.forms import ESProvinceSelect
 from .models import Direccion
 from django.conf import settings
-from django_countries.fields import CountryField  # Para manejar países
 import requests
 import logging
 import phonenumbers  # Para validar el teléfono
@@ -12,7 +11,7 @@ import phonenumbers  # Para validar el teléfono
 logger = logging.getLogger(__name__)
 
 class DireccionForm(forms.ModelForm):
-    pais = CountryField().formfield()  # Campo de país con django-countries
+    pais = forms.CharField(initial="España", widget=forms.HiddenInput())
     provincia = forms.ChoiceField(choices=PROVINCE_CHOICES, widget=ESProvinceSelect())  # Provincias de España con selector    print(provincia)
 
     class Meta:

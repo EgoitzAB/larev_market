@@ -71,29 +71,3 @@ def generar_enviar_factura(orden_id):
         logger.error(f"Error al generar la factura para la orden con ID {orden_id}: {str(e)}")
         return f'Error al generar la factura para la orden con ID {orden_id}: {str(e)}'
 
-
-
-@shared_task
-def liberar_stock_en_10_minutos(orden_id):
-    """Verifica si la orden sigue pendiente después de 10 minutos y libera stock"""
-    try:
-        orden = Orden.objects.get(id=orden_id)
-        if orden.estado == "pendiente":  # Si no se pagó, liberar stock
-            with transaction.atomic():
-                for item in orden.items.all():
-                    item.producto.stock += item.cantidad
-                    item.producto.save()
-
-            # No eliminar la orden, solo cambiar el estado
-            orden.estado = "fallida"
-            orden.save()
-
-            # También actualizar el estado del pago
-            pago = orden.pago
-            if pago:
-                pago.estado = "fallido"
-                pago.save()
-
-    except Orden.DoesNotExist:
-        pass
-

@@ -39,14 +39,18 @@
                     {% if variante.talla %}
                     <p class="card-text text-white">Talla: {{ variante.talla }}</p>
                     {% endif %}
+                    {% if variante.stock > 0 %}
                     <form method="post" action="{% url 'carrito:carrito_añadir' %}">
                         {% csrf_token %}
+                        <input type="hidden" name="variante_id" value="{{ objeto.id }}">
                         <input type="hidden" name="cantidad" value="1">
-                        <input type="hidden" name="variante_id" value="{{ variante.id }}">
-                        <button type="submit" class="btn btn-dark border-light text-light">
+                        <button type="submit" class="btn btn-dark border-light text-light boton-detalle">
                             <i class="fas fa-cart-plus"></i> Añadir al carrito
                         </button>
                     </form>
+                    {% else %}
+                    <p class="text-danger fw-bold mt-4">Este producto está sin stock</p>
+                    {% endif %}
                 </div>
             </div>
         </div>

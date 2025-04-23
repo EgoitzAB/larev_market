@@ -15,8 +15,8 @@
 :root {
     --primary-color: #bfff00;  /* Este es tu color primario */
     --secondary-color: #2ecc71;
-    --color-terciario: #43c59a;
-    --accent-color: #fffb00;
+    --color-terciario: #2c9b42;
+    --accent-color: #8ee42d;
     --background-color: #ffffff;
     --text-color: #2c3e50;
     --dark-color: #0d1720;
@@ -283,9 +283,6 @@ p, span, a, li {
 #searchModal .modal-content {
     background: rgba(var(--accent-color), 0.8);
 }
-
-/* Ajustar el tamaño del contenedor para evitar el solapamiento */
-/* Contenedor general */
 
 
 /* Bloque de subcategorías */
@@ -666,6 +663,56 @@ p, span, a, li {
     height: 50px;
 }
 
+.peso-label {
+    position: relative;
+    display: inline-block;
+    margin: 0.5rem;
+}
+
+.peso-label input[type="radio"] {
+    display: none;
+}
+
+.peso-label input[type="radio"]:checked + .peso-span {
+    border: 2px solid #0f0;
+}
+
+.peso-span {
+    display: inline-block;
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    text-align: center;
+    line-height: 60px;
+    font-size: 14px;
+    color: white;
+    background-color: transparent;
+    position: relative;
+    transition: background-color 0.2s ease;
+}
+
+.peso-span:hover {
+    cursor: pointer;
+    background-color: #444;
+}
+
+/* Para los sin stock */
+.peso-label.sin-stock .peso-span {
+    color: gray;
+    background-color: #333;
+    text-decoration: line-through;
+    border-color: #dc3545;
+}
+
+.icono-sin-stock {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    font-size: 0.8rem;
+    color: #dc3545;
+}
+
 /* Variantes de productos - Estilo para mostrar los precios */
 .variant-prices {
     display: none;
@@ -693,11 +740,10 @@ p, span, a, li {
     width: 100%;
     border-radius: 0;
     margin-top: 0;
-    /* background-color: #28a745;
-    color: white; */
     font-weight: bold;
     height: 50px;
 }
+
 @media (max-width: 768px) {
     /* Oculta los precios sobre la imagen en móviles */
     .variant-prices {
@@ -1155,7 +1201,7 @@ p, span, a, li {
 .update-button, 
 .remove-button, 
 .remove-all-button {
-    background-color: #e1ffe1;
+    background-color: #51d851;
     color: #333;
     padding: 0.3rem 0.7rem;
     border: none;

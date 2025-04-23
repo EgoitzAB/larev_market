@@ -11,7 +11,7 @@
 
 {% block content %}
 <div class="checkout-container container">
-    <h1 class="mb-4">Checkout</h1>
+    <h1 class="mb-4 mt-4">Checkout</h1>
     <!-- Incluimos novalidate para desactivar la validación nativa -->
     <form method="post" id="checkout-form" novalidate>
         {% csrf_token %}
@@ -42,6 +42,11 @@
                                                 {{ direccion.direccion }}, {{ direccion.ciudad }} - {{ direccion.codigo_postal }}, {{ direccion.pais }}
                                             </div>
                                         </label>
+                                        <div class="ms-auto">
+                                            <button class="btn btn-sm btn-danger eliminar-direccion" data-id="{{ direccion.id }}">
+                                                Eliminar
+                                            </button>
+                                        </div>
                                     </li>
                                 {% endfor %}
                             </ul>
@@ -214,6 +219,40 @@
         // Ejecutar las funciones al cargar la página
         actualizarEntregaYFormaPago();
         actualizarDireccion();
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const botonesEliminar = document.querySelectorAll('.eliminar-direccion');
+
+        botonesEliminar.forEach(boton => {
+            boton.addEventListener('click', function (e) {
+                e.preventDefault();
+                const direccionId = this.getAttribute('data-id');
+                if (confirm('¿Estás seguro de que quieres eliminar esta dirección?')) {
+                    fetch(`/checkout/eliminar_direccion/${direccionId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}',
+                            'Content-Type': 'application/json',
+                        },
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById(`direccion-${direccionId}`).remove();
+                            alert(data.message);
+                        } else {
+                            alert(data.message);
+                        }
+                    })
+                    .catch(err => {
+                        alert("Error al eliminar la dirección.");
+                        console.error(err);
+                    });
+                }
+            });
+        });
     });
 </script>
 {% endblock javascript %}

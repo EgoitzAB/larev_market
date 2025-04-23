@@ -12,7 +12,7 @@ from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.template.loader import render_to_string
 from core.tasks import generar_enviar_factura
-
+from decimal import Decimal, ROUND_HALF_UP
 from weasyprint import HTML
 from io import BytesIO
 
@@ -165,29 +165,59 @@ def detalle_orden(request, orden_id):
 
     return render(request, 'core/detalle_orden.html', {'orden': orden})
 
+@login_required
 def enviar_factura(request, orden_id):
-    orden = get_object_or_404(Orden, id=orden_id, pago__estado='exitoso')
-    generar_enviar_factura.delay(orden.id)  # Llamada asíncrona con Celery
-    return JsonResponse({'mensaje': 'Factura en proceso de envío.'})
+    try:
+        orden = Orden.objects.get(id=orden_id, cliente=request.user)
+    except Orden.DoesNotExist:
+        messages.error(request, "No se encontró esa orden.")
+        return redirect('perfil')
+
+    # Disparamos la tarea para generar y enviar la factura
+    generar_enviar_factura.delay(orden.id)
+    messages.success(request, f"Factura de la orden #{orden.id} en proceso de generación.")
+    return redirect('perfil')
 
 @login_required
 def descargar_factura(request, orden_id):
-    orden = get_object_or_404(Orden, id=orden_id, cliente=request.user)
+    try:
+        orden = Orden.objects.get(id=orden_id, cliente=request.user)
+    except Orden.DoesNotExist:
+        messages.error(request, "No se encontró esa orden.")
+        return redirect('perfil')
+    # Calcular IVA
+    total = orden.get_total_cost()  # Este total ya INCLUYE IVA (21%)
+    iva_rate = Decimal("0.21")
 
-    # Verificar que la orden está completada y el pago es exitoso
-    if orden.estado != 'completada' or orden.pago.estado != 'exitoso':
-        return HttpResponse("No puedes descargar la factura de una orden no completada.", status=400)
+    # 1) Base imponible: separar el IVA
+    divisor = (Decimal("1.00") + iva_rate)
+    base_imponible = (total / divisor).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
-    # Renderizar la factura en HTML
-    contexto = {'orden': orden}
-    html_string = render_to_string('core/factura.html', contexto)
+    # 2) IVA = total - base imponible
+    iva = (total - base_imponible).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
-    # Generar PDF
+    # 3) Total con IVA = total (sin cambios)
+    total_con_iva = total.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+    total_weight = sum(
+        (item.producto.peso or Decimal("0")) * item.cantidad
+        for item in orden.items.all()
+    )
+    # Redondear a 2 decimales si fuera decimal
+    total_weight = total_weight.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+    # Generar y descargar PDF
+    html_string = render_to_string('core/factura.html', {
+                                                        'orden': orden,
+                                                        'base_imponible': base_imponible,
+                                                        'iva': iva,
+                                                        'total_con_iva': total_con_iva,
+                                                        'total_weight': total_weight,  # en gramos
+                                        })
     pdf_buffer = BytesIO()
     HTML(string=html_string).write_pdf(pdf_buffer)
     pdf_buffer.seek(0)
 
-    # Crear respuesta para la descarga
     response = HttpResponse(pdf_buffer.read(), content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="factura_{orden.id}.pdf"'
     return response

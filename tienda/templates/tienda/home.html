@@ -87,16 +87,29 @@ Tienda de productos de CBD, página principal
                         </div>
                         <div class="peso-opciones">
                             {% for variante in producto.variantes %}
-                            <label>
-                                <input type="radio" id="variante_{{ variante.id }}" name="variante_id" value="{{ variante.id }}" required 
-                                data-precio="{{ variante.precio }}" 
-                                data-peso="{{ variante.peso }}" 
-                                {% if forloop.first %}checked{% endif %} {% if variante.stock <= 0 %}disabled{% endif %}>                                
-                                <span>{{ variante.peso }}g</span>
+                            <label class="peso-label {% if variante.stock <= 0 %}sin-stock{% endif %}">
+                                <input 
+                                    type="radio" 
+                                    id="variante_{{ variante.id }}" 
+                                    name="variante_id" 
+                                    value="{{ variante.id }}" 
+                                    required
+                                    data-precio="{{ variante.precio }}" 
+                                    data-peso="{{ variante.peso }}" 
+                                    {% if forloop.first and variante.stock > 0 %}checked{% endif %}
+                                    {% if variante.stock <= 0 %}disabled{% endif %}
+                                >
+                                <span 
+                                    class="peso-span" 
+                                    title="{% if variante.stock <= 0 %}Sin stock{% else %}Disponible{% endif %}">
+                                    {{ variante.peso }}g
+                                    {% if variante.stock <= 0 %}
+                                    <i class="fas fa-times-circle icono-sin-stock"></i>
+                                    {% endif %}
+                                </span>
                             </label>
                             {% endfor %}
                         </div>
-                
                         <input type="hidden" name="cantidad" value="1">
                         <input type="hidden" name="sobreescribir" value="false">
                     </form>

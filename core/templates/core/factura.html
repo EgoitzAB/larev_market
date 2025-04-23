@@ -2,127 +2,146 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Factura #{{ orden.id }}</title>
     <style>
-        :root {
-            --primary-color: #4CAF50;
-            --secondary-color: #333;
-            --light-bg: #f9f9f9;
-            --border-color: #ddd;
-            --text-color: #444;
-            --font-family: 'Arial', sans-serif;
-        }
-
         body {
-            font-family: var(--font-family);
-            margin: 0;
-            padding: 20px;
-            color: var(--text-color);
-            background-color: var(--light-bg);
+            font-family: 'Helvetica', sans-serif;
+            font-size: 12px;
+            color: #000;
+            margin: 40px;
         }
 
-        .container {
-            max-width: 800px;
-            margin: auto;
-            padding: 20px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        h1, h2, h3 {
+        .header, .footer {
             text-align: center;
-            color: var(--primary-color);
         }
 
-        .empresa-info, .cliente-info {
-            margin-bottom: 20px;
-            padding: 10px;
-            border-radius: 5px;
-            background-color: var(--light-bg);
+        .header h1 {
+            font-size: 18px;
+            margin-bottom: 4px;
         }
 
-        .factura-detalle {
+        .pagada {
+            color: green;
+            border: 2px solid green;
+            padding: 8px 12px;
+            display: inline-block;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        .info-factura, .info-cliente {
+            margin-top: 20px;
+        }
+
+        table.detalle {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
 
-        .factura-detalle th, .factura-detalle td {
-            border: 1px solid var(--border-color);
-            padding: 10px;
+        table.detalle th, table.detalle td {
+            border: 1px solid #000;
+            padding: 6px;
             text-align: left;
         }
 
-        .factura-detalle th {
-            background-color: var(--primary-color);
-            color: white;
+        table.detalle th {
+            background-color: #f0f0f0;
         }
 
-        .total {
+        .totales {
+            margin-top: 20px;
+            width: 100%;
             text-align: right;
-            font-size: 18px;
-            font-weight: bold;
-            margin-top: 20px;
         }
 
-        .footer {
-            text-align: center;
+        .iva-box {
+            border: 1px solid #000;
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 11px;
+        }
+
+        .footer p {
+            font-size: 11px;
+            margin-top: 30px;
+        }
+
+        .datos-bancarios {
+            font-size: 11px;
             margin-top: 20px;
-            font-size: 12px;
-            color: var(--secondary-color);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="empresa-info">
-            <h1>La Revolución Verde CBD</h1>
-            <p>Dirección: Calle San Francisco 54, Donostia-San Sebastián</p>
-            <p>Teléfono: +34 123 456 789</p>
-            <p>Email: contacto@revolucionverde.com</p>
-        </div>
-        
-        <hr>
 
-        <div class="cliente-info">
-            <h2>Factura para:</h2>
-            <p><strong>Nombre:</strong> {{ orden.cliente.first_name }} {{ orden.cliente.last_name }}</p>
-            <p><strong>Email:</strong> {{ orden.cliente.email }}</p>
-            <p><strong>Dirección de envío:</strong> {{ orden.direccion_envio }}</p>
-            <p><strong>Fecha de compra:</strong> {{ orden.fecha_creacion|date:"d/m/Y" }}</p>
-        </div>
-        
-        <hr>
+<div class="header">
+    <h1>LA REVOLUCIÓN VERDE CBD</h1>
+    <p>C/ de la Paz 5 - CC Dendarabia Local 5A, 01004 Vitoria-Gasteiz</p>
+    <p>CIF: E72626005 | Tel: 932 555 350</p>
+</div>
 
-        <h2>Detalles de la Factura</h2>
-        <table class="factura-detalle">
-            <thead>
-                <tr>
-                    <th>Producto</th>
-                    <th>Cantidad</th>
-                    <th>Precio Unitario</th>
-                    <th>Subtotal</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in orden.items.all %}
-                <tr>
-                    <td>{{ item.producto.nombre }}</td>
-                    <td>{{ item.cantidad }}</td>
-                    <td>{{ item.precio_unitario|floatformat:2 }} €</td>
-                    <td>{{ item.cantidad|floatformat:2|add:item.precio_unitario }} €</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+{% if orden.pago.estado == 'exitoso' %}
+    <div class="pagada">FACTURA PAGADA</div>
+{% endif %}
 
-        <p class="total">Total: <strong>{{ orden.total }} €</strong></p>
-        
-        <div class="footer">
-            <p>Gracias por su compra. Si tiene alguna consulta, contáctenos.</p>
-        </div>
-    </div>
+<div class="info-factura">
+    <strong>Factura Nº:</strong> {{ orden.id }}<br>
+    <strong>Fecha:</strong> {{ orden.fecha_creacion|date:"d/m/Y" }}
+</div>
+
+<div class="info-cliente">
+    <strong>Cliente:</strong> {{ orden.cliente.get_full_name|default:orden.cliente.username }}<br>
+    <strong>Email:</strong> {{ orden.cliente.email }}<br>
+    <strong>Dirección:</strong> {{ orden.direccion_envio }}
+</div>
+
+<table class="detalle">
+    <thead>
+    <tr>
+        <th>Producto</th>
+        <th>Unidades</th>
+        <th>Precio U.</th>
+        <th>Dto.</th>
+        <th>Importe</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for item in orden.items.all %}
+    <tr>
+        <td>{{ item.producto.nombre }}</td>
+        <td>{{ item.cantidad }}</td>
+        <td>{{ item.precio_unitario|floatformat:2 }} €</td>
+        <td>{{ orden.descuento }}%</td>
+        <td>{{ item.precio_unitario|floatformat:2|add:""|floatformat:"2" }} €</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<div class="totales">
+    <p><strong>Peso total:</strong> {{ total_weight }} g</p>
+    <p><strong>Subtotal:</strong> {{ orden.get_total_cost_before_discount|floatformat:2 }} €</p>
+    <p><strong>Descuento:</strong> -{{ orden.get_discount|floatformat:2 }} €</p>
+    <p><strong>Total:</strong> {{ orden.get_total_cost|floatformat:2 }} €</p>
+</div>
+
+<div class="iva-box">
+    <p><strong>Base IVA (21%):</strong> {{ base_imponible|floatformat:2 }} €</p>
+    <p><strong>IVA:</strong> {{ iva|floatformat:2 }} €</p>
+    <p><strong>Total con IVA:</strong> {{ total_con_iva|floatformat:2 }} €</p>
+</div>
+
+<div class="datos-bancarios">
+    <strong>Datos bancarios para transferencia:</strong><br>
+    IBAN: ES00 1234 5678 9012 3456 7890<br>
+    Banco: Banco Verde<br>
+    Titular: LA REVOLUCIÓN VERDE CBD
+</div>
+
+<div class="footer">
+    <p>Para cualquier cambio o devolución es indispensable esta factura. No se aceptan pasados 15 días.</p>
+</div>
+
 </body>
 </html>

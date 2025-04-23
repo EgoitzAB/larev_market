@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from django.contrib import messages
 from .models import Direccion
 from pagos.models import Orden
@@ -131,6 +132,7 @@ def checkout(request):
     })
 
 
+@require_POST
 def eliminar_direccion(request, direccion_id):
     if not request.user.is_authenticated:
         return JsonResponse({'success': False, 'message': 'No estás autenticado.'})

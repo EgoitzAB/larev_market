@@ -10,7 +10,6 @@ from coupon.models import Coupon
 class Orden(models.Model):
     ESTADO_CHOICES = (
         ('pendiente', 'Pendiente'),
-        ('procesando', 'Procesando'),
         ('completada', 'Completada'),
         ('fallida', 'Fallida'),
         ('cancelada', 'Cancelada'),
@@ -21,7 +20,7 @@ class Orden(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     total = models.DecimalField(max_digits=10, decimal_places=2)
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='pendiente')
-
+    stock_reservado = models.BooleanField(default=False)
     coupon = models.ForeignKey(Coupon,
                                related_name='ordenes',
                                blank=True,
@@ -39,7 +38,7 @@ class Orden(models.Model):
         """
         Método para obtener el costo total de la orden antes de aplicar el descuento.
         """
-        return sum(item.precio * item.cantidad for item in self.items.all())
+        return sum(item.precio_unitario * item.cantidad for item in self.items.all())
     
     def get_discount(self):
         total_cost = self.get_total_cost_before_discount()
