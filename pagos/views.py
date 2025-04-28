@@ -13,7 +13,7 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from django.conf import settings
 from django.views import View
 from .utils import validate_paygreen_signature
-from core.tasks import generar_enviar_factura
+from larev.tasks import generar_enviar_factura
 
 # --------------- VISTA PRINCIPAL: REALIZAR COMPRA ---------------
 @login_required

@@ -11,7 +11,7 @@ from pagos.models import Orden
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.template.loader import render_to_string
-from core.tasks import generar_enviar_factura
+from larev.tasks import generar_enviar_factura
 from decimal import Decimal, ROUND_HALF_UP
 from weasyprint import HTML
 from io import BytesIO
