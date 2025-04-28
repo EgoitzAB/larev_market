@@ -4,32 +4,52 @@ from localflavor.es.es_provinces import PROVINCE_CHOICES
 from localflavor.es.forms import ESProvinceSelect
 from .models import Direccion
 from django.conf import settings
+from django.forms import HiddenInput
 import requests
 import logging
 import phonenumbers  # Para validar el teléfono
+import pycountry
+from babel import Locale
 
 logger = logging.getLogger(__name__)
 
+
+def get_region_choices():
+    locale = Locale('es')
+    choices = []
+    for code in phonenumbers.SUPPORTED_REGIONS:
+        country = pycountry.countries.get(alpha_2=code)
+        if not country:
+            continue
+        name = locale.territories.get(code, country.name)
+        choices.append((code, name))
+    return sorted(choices, key=lambda x: x[1])
+
 class DireccionForm(forms.ModelForm):
-    pais = forms.CharField(initial="España", widget=forms.HiddenInput())
+    pais = forms.CharField(initial="ES", widget=forms.HiddenInput())
     provincia = forms.ChoiceField(choices=PROVINCE_CHOICES, widget=ESProvinceSelect())  # Provincias de España con selector    print(provincia)
+    phone_region = forms.ChoiceField(
+        choices=get_region_choices(),
+        label='País del teléfono',
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
 
     class Meta:
         model = Direccion
         fields = ['nombre', 'apellido', 'direccion', 'ciudad', 'codigo_postal', 
-                  'provincia', 'pais', 'email', 'telefono', 'es_direccion_envio']
+                  'provincia', 'pais', 'email', 'phone_region', 'telefono', 'es_direccion_envio']
 
+        
     def clean_telefono(self):
         """
         Valida que el número de teléfono sea válido.
         """
         telefono = self.cleaned_data.get('telefono')
-        pais = self.cleaned_data.get('pais')
-
-        if telefono and pais:
+        region = self.cleaned_data.get('phone_region')  # uso exclusivo para validación
+        if telefono and region:
             try:
                 # Parsear el número de teléfono con el código de país
-                parsed_phone = phonenumbers.parse(telefono, pais)
+                parsed_phone = phonenumbers.parse(telefono, region)
                 if not phonenumbers.is_valid_number(parsed_phone):
                     raise ValidationError("El número de teléfono no es válido para el país seleccionado.")
             except phonenumbers.NumberParseException as e:

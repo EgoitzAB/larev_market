@@ -28,7 +28,7 @@ def generar_enviar_factura(orden_id):
         logger.info(f"Pago encontrado para la orden ID {orden_id}: {pago} - Estado del pago: {pago.estado}")
 
         # Comprobar si el estado de la orden es 'completada' y el pago es 'exitoso'
-        if orden.estado == 'completada' and pago.estado == 'exitoso':
+        if orden.estado == 'completada':
             logger.info(f"Orden ID {orden_id} está completada y el pago es exitoso. Generando la factura.")
 
             # Preparar el contexto para la plantilla

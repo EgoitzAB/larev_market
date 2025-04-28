@@ -13,7 +13,7 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from django.conf import settings
 from django.views import View
 from .utils import validate_paygreen_signature
-
+from core.tasks import generar_enviar_factura
 
 # --------------- VISTA PRINCIPAL: REALIZAR COMPRA ---------------
 @login_required
@@ -84,6 +84,11 @@ class PayGreenAuthorizedWebhook(View):
                     orden.pago.estado = 'exitoso'
                     orden.pago.save()
 
+                logging.info(f"Orden {order_id} marcada como completada por webhook.")
+
+                # **Aquí lanzamos la tarea**: generará y enviará la factura
+                generar_enviar_factura.delay(orden.id)
+                logging.info(f"Tarea generar_enviar_factura enviada para la orden {order_id}.")
         return HttpResponse("OK", status=200)
 
 

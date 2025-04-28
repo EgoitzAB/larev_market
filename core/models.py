@@ -24,12 +24,3 @@ class InfoTienda(models.Model):
 
     def __str__(self):
         return self.nombre_tienda
-
-
-class Favorito(models.Model):
-    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    producto_variante = models.ForeignKey(ProductoVariante, on_delete=models.CASCADE)
-    fecha_agregado = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ('usuario', 'producto_variante')

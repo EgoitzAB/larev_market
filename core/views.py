@@ -5,7 +5,7 @@ from django.utils.timezone import now, timedelta
 from django.urls import reverse
 from django.views import generic
 from allauth.account.models import EmailAddress
-from .models import InfoTienda, Favorito
+from .models import InfoTienda
 from tienda.models import ProductoVariante
 from pagos.models import Orden
 from django.contrib import messages
@@ -91,64 +91,15 @@ class PrivacidadView(generic.TemplateView):
 
 @login_required
 def perfil(request):
-    # Obtener los favoritos del usuario
-    favoritos = Favorito.objects.filter(usuario=request.user)
     # Obtener las órdenes no finalizadas (estado diferente a 'completada')
     ordenes_no_finalizadas = Orden.objects.filter(cliente=request.user).exclude(estado='completada')
     # Obtener el historial de compras (órdenes completadas)
     historial_compras = Orden.objects.filter(cliente=request.user, estado='completada')
     context = {
-        'favoritos': favoritos,
         'ordenes_no_finalizadas': ordenes_no_finalizadas,
         'historial_compras': historial_compras,
     }
     return render(request, 'core/perfil.html', context)
-
-@login_required(login_url='account_login')
-def toggle_favorito(request):
-    """
-    Permite añadir o quitar un producto de favoritos con AJAX.
-    Solo funciona si el usuario está autenticado.
-    """
-    if request.method != "POST":
-        return JsonResponse({"error": "Método no permitido."}, status=405)
-
-    variante_id = request.POST.get("variante_id")
-    if not variante_id:
-        return JsonResponse({"error": "No se proporcionó una variante válida."}, status=400)
-
-    variante = get_object_or_404(ProductoVariante, id=variante_id)
-
-    favorito, created = Favorito.objects.get_or_create(usuario=request.user, producto_variante=variante)
-  
-    if not created:
-        favorito.delete()
-        messages.success(request, f"{variante.nombre} eliminado de tus favoritos.")
-        return JsonResponse({"added": False})
-    
-    messages.success(request, f"{variante.nombre} añadido a tus favoritos.")
-    return JsonResponse({"added": True})
-
-@login_required
-def guardar_favoritos(request):
-    """
-    Guarda los favoritos del usuario cuando se cierra sesión o el navegador.
-    """
-    if request.method == "POST":
-        data = json.loads(request.body)
-        favoritos = data.get("favoritos", [])
-
-        # Elimina los actuales favoritos del usuario
-        Favorito.objects.filter(usuario=request.user).delete()
-
-        # Guarda los nuevos favoritos
-        for variante_id in favoritos:
-            variante = get_object_or_404(ProductoVariante, id=variante_id)
-            Favorito.objects.get_or_create(usuario=request.user, producto_variante=variante)
-
-        return JsonResponse({"success": True})
-
-    return JsonResponse({"error": "Método no permitido."}, status=405)
 
 @login_required
 def detalle_orden(request, orden_id):
@@ -171,12 +122,12 @@ def enviar_factura(request, orden_id):
         orden = Orden.objects.get(id=orden_id, cliente=request.user)
     except Orden.DoesNotExist:
         messages.error(request, "No se encontró esa orden.")
-        return redirect('perfil')
+        return redirect('core:perfil')
 
     # Disparamos la tarea para generar y enviar la factura
     generar_enviar_factura.delay(orden.id)
     messages.success(request, f"Factura de la orden #{orden.id} en proceso de generación.")
-    return redirect('perfil')
+    return redirect('core:perfil')
 
 @login_required
 def descargar_factura(request, orden_id):
@@ -184,7 +135,7 @@ def descargar_factura(request, orden_id):
         orden = Orden.objects.get(id=orden_id, cliente=request.user)
     except Orden.DoesNotExist:
         messages.error(request, "No se encontró esa orden.")
-        return redirect('perfil')
+        return redirect('core:perfil')
     # Calcular IVA
     total = orden.get_total_cost()  # Este total ya INCLUYE IVA (21%)
     iva_rate = Decimal("0.21")

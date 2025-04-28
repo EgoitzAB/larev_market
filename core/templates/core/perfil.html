@@ -22,80 +22,66 @@ Perfil de {{ request.user.username }}
 
 {% block content %}
 <div class="profile-container">
-    <div class="profile-header">
-        <h2>Perfil de {{ request.user.username| title }}</h2>
-        <p>Nombre: {{ request.user.first_name }}</p>
-        <p>Apellido: {{ request.user.last_name }}</p>
-        <p>Email: {{ request.user.email }}</p>
-    </div>
-
-    <div class="profile-tabs">
-        <h2>Detalles de {{ user.username| title }}</h2>
-        <!-- Pestañas -->
-        <ul class="nav nav-tabs" id="perfilTabs" role="tablist">
-            <li class="nav-item">
-                <a class="nav-link active" id="favoritos-tab" data-toggle="tab" href="#favoritos" role="tab" aria-controls="favoritos" aria-selected="true">Favoritos</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="ordenes-no-finalizadas-tab" data-toggle="tab" href="#ordenes-no-finalizadas" role="tab" aria-controls="ordenes-no-finalizadas" aria-selected="false">Órdenes no Finalizadas</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="historial-compras-tab" data-toggle="tab" href="#historial-compras" role="tab" aria-controls="historial-compras" aria-selected="false">Historial de Compras</a>
-            </li>
-        </ul>
-
-        <!-- Contenido de las pestañas -->
-<!-- Panel de Favoritos -->
-<div class="tab-pane fade show active" id="favoritos" role="tabpanel" aria-labelledby="favoritos-tab">
-    <h3 class="text-white">Favoritos</h3>
-    <div class="p-3 bg-dark text-white rounded">
-      <ul class="favoritos-list list-unstyled">
-        {% for favorito in favoritos %}
-          <li class="d-flex justify-content-between align-items-center border-bottom py-2">
-            <span>{{ favorito.producto_variante.nombre }}</span>
-            <button class="btn btn-sm btn-danger favorito-btn" data-variante-id="{{ favorito.producto_variante.id }}">
-              <i class="fa-solid fa-heart text-white"></i>
-            </button>
-          </li>
-        {% empty %}
-          <p class="no-items text-light">No tienes productos en favoritos.</p>
-        {% endfor %}
-      </ul>
-    </div>
+  <div class="profile-header">
+      <h2>Perfil de {{ request.user.username|title }}</h2>
+      <p>Nombre: {{ request.user.first_name }}</p>
+      <p>Apellido: {{ request.user.last_name }}</p>
+      <p>Email: {{ request.user.email }}</p>
   </div>
 
-            <!-- Panel de Órdenes no Finalizadas -->
-            <div class="tab-pane fade" id="historial-compras" role="tabpanel" aria-labelledby="historial-compras-tab">
+  <div class="profile-tabs">
+      <h2>Detalles de {{ user.username|title }}</h2>
+
+      <!-- Pestañas -->
+      <ul class="nav nav-tabs" id="perfilTabs" role="tablist">
+          <li class="nav-item">
+              <a class="nav-link active" id="ordenes-no-finalizadas-tab" data-toggle="tab" href="#ordenes-no-finalizadas" role="tab" aria-controls="ordenes-no-finalizadas" aria-selected="true">Órdenes no Finalizadas</a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link" id="historial-compras-tab" data-toggle="tab" href="#historial-compras" role="tab" aria-controls="historial-compras" aria-selected="false">Historial de Compras</a>
+          </li>
+      </ul>
+
+      <!-- Contenido de las pestañas -->
+      <div class="tab-content p-3">
+          <!-- Panel de Órdenes no Finalizadas (aquí deberías meter contenido luego) -->
+          <div class="tab-pane fade show active" id="ordenes-no-finalizadas" role="tabpanel" aria-labelledby="ordenes-no-finalizadas-tab">
+              <h3 class="text-white">Órdenes no Finalizadas</h3>
+              <p class="text-light">Contenido de órdenes no finalizadas.</p>
+          </div>
+
+          <!-- Panel de Historial de Compras -->
+          <div class="tab-pane fade" id="historial-compras" role="tabpanel" aria-labelledby="historial-compras-tab">
               <h3 class="text-white">Historial de Compras</h3>
               <ul class="historial-list list-unstyled">
-                {% for orden in historial_compras %}
-                  <li class="py-2 border-bottom d-flex align-items-center justify-content-between text-light">
-                    <div>
-                      <strong>Orden #{{ orden.id }}</strong> —
-                      {{ orden.fecha_creacion|date:"d/m/Y H:i" }} —
-                      Total: {{ orden.total }} €
-                      {% if orden.pago and orden.pago.estado == 'exitoso' %}
-                        <span class="badge badge-success ml-2">Pagada</span>
-                      {% endif %}
-                    </div>
-                    <div>
-                      <a href="{% url 'core:enviar_factura' orden.id %}" class="btn btn-sm btn-primary">Generar</a>
-                      <a href="{% url 'core:descargar_factura' orden.id %}" class="btn btn-sm btn-success ml-1">Descargar</a>
-                    </div>
-                  </li>
-                {% empty %}
-                  <p class="no-items text-light">No tienes compras realizadas.</p>
-                {% endfor %}
+                  {% for orden in historial_compras %}
+                      <li class="py-2 border-bottom d-flex align-items-center justify-content-between text-light">
+                          <div>
+                              <strong>Orden #{{ orden.id }}</strong> —
+                              {{ orden.fecha_creacion|date:"d/m/Y H:i" }} —
+                              Total: {{ orden.total }} €
+                              {% if orden.pago and orden.pago.estado == 'exitoso' %}
+                                  <span class="badge badge-success ml-2">Pagada</span>
+                              {% endif %}
+                          </div>
+                          <div>
+                              <a href="{% url 'core:enviar_factura' orden.id %}" class="btn btn-sm btn-primary">Generar</a>
+                              <a href="{% url 'core:descargar_factura' orden.id %}" class="btn btn-sm btn-success ml-1">Descargar</a>
+                          </div>
+                      </li>
+                  {% empty %}
+                      <p class="no-items text-light">No tienes compras realizadas.</p>
+                  {% endfor %}
               </ul>
-            </div>
-        </div>
-    </div>
+          </div>
+      </div>
+
+  </div>
 </div>
+
 
 <form method="POST" style="display: none;">
     {% csrf_token %}
 </form>
-
-<script src="{% static 'js/favoritos.js' %}"></script>
 {% endblock content %}
 
